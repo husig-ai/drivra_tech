@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Roadmap &amp; Cost — Drivra Tech</title>
+<link rel="icon" href="static/img/drivra-mark.png">
+<link rel="stylesheet" href="static/css/theme.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="wordmark"><img src="static/img/drivra-mark.png" alt="">Drivra <span class="tag">Tech</span></a>
+  <nav class="topnav">
+    <a href="index.html">Overview</a>
+    <a href="product.html">Product</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="financing.html">Rent-to-Own</a>
+    <a href="roadmap.html" class="active">Roadmap &amp; Cost</a>
+  </nav>
+</div>
+
+<section class="hero" style="padding-bottom: var(--s6)">
+  <div class="shell">
+    <div class="eyebrow">Roadmap &amp; Cost</div>
+    <h1>One sequence, not four separate projects</h1>
+    <p class="lede">Platform hardening and the new financing product aren't competing priorities — the
+    hardening work is what makes the financing product's credit signal trustworthy, and the financing
+    product is the forcing function that makes the hardening work worth doing now rather than eventually.
+    This page sequences both together, then estimates what it costs.</p>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="shell">
+    <h2>Phase 0 — Not engineering (parallel, starts now)</h2>
+    <ul class="tight">
+      <li>Resolve the legal structuring path (Path A/B/C — see <a href="financing.html#regulatory">Regulation</a>) with Nepali financial-regulatory counsel.</li>
+      <li>Direct competitive diligence on RYD Nepal — pricing verification, actual legal structure, fleet size, real default handling.</li>
+      <li>Start conversations with a potential licensed-lender partner if pursuing Path A (Hulas Finserv or comparable Class C/D institution).</li>
+      <li>Decide the GitHub org/governance question (husig-ai vs. Drivra-Mobility split) before a fifth product adds to the fragmentation.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h2>Phase 1 — Harden &amp; consolidate (weeks, mostly low-lift)</h2>
+    <p>This is the "low-hanging fruit" column from <a href="architecture.html#investments">Architecture</a>,
+    done before or alongside the start of financing engineering — cheap, and removes the specific risks a
+    fintech product would otherwise inherit.</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Item</th><th>Why now</th></tr>
+        <tr><td>Lock down Express's CORS policy</td><td>Live vulnerability, independent of everything else</td></tr>
+        <tr><td>Fix Express's dual schema-source-of-truth startup pattern</td><td>Prevents silent schema drift before more services depend on this pattern</td></tr>
+        <tr><td>Add Express smoke tests</td><td>Zero coverage today; cheap to start, expensive to retrofit later</td></tr>
+        <tr><td>Turn on automated Postgres backups for Express</td><td>Closes a real data-loss risk immediately, ahead of any RDS migration</td></tr>
+        <tr><td>Fix GPS Dashboard's silent PostgREST truncation</td><td>Currently a correctness bug, not just a performance one</td></tr>
+        <tr><td>Write the "revoke anon/authenticated" rule down as a standing checklist</td><td>Must apply to the new Financing service's Supabase project from day one</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h2>Phase 2 — The identity layer &amp; MVP financing (~4–7 months)</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Platform</h3>
+        <ul class="tight">
+          <li>Build the canonical driver-identity layer (see <a href="architecture.html#vision">Architecture</a>)</li>
+          <li>Retire GPS Dashboard's direct anon-key table access in favor of a proper read API</li>
+          <li>Migrate Express's database to a managed service (RDS or its own Supabase project)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Financing MVP — human-in-the-loop</h3>
+        <ul class="tight">
+          <li>Driver/KYC data model, document upload, DIY Textract/Rekognition-assisted but human-approved verification</li>
+          <li>Manual underwriting review (no automated scorecard yet)</li>
+          <li>Basic servicing ledger, admin portal, SMS reminders</li>
+          <li>ConnectIPS/Fonepay-first manual payment reconciliation, field-agent cash collection tool</li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:var(--s5)">Goal: a small pilot cohort (10–20 drivers) fully human-verified before
+    automating anything — the same path Tugende and M-KOPA reportedly took before automating.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h2>Phase 3 — Automate what Phase 2 proved</h2>
+    <ul class="tight">
+      <li>Rules-based scorecard wired to the identity layer's Upahar (and Express, if live) performance data</li>
+      <li>Guarantor workflow for cold-start applicants</li>
+      <li>ConnectIPS mandate automation, delinquency dashboard, formal lien-registration workflow tracking</li>
+      <li>Express's partner API layer: auth, per-partner rate limiting, signed webhooks, idempotency, OpenAPI docs</li>
+      <li>Point-to-point delivery as a distinct Express order type</li>
+      <li>Cross-product analytics/data-warehouse layer live, fed on a schedule from each product's database</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h2>Phase 4 — Scale</h2>
+    <ul class="tight">
+      <li>Behavioral credit scoring from the financing service's own accumulated repayment data</li>
+      <li>Driver self-service native app (folded into Upahar or standalone)</li>
+      <li>Evaluate telematics/asset-monitoring for financed vehicles, reusing GPS Dashboard's existing pipeline, only if the reputational/hardware trade-off is judged worth it</li>
+      <li>Consolidate the two independently-built gamification systems (Upahar, Express) if that's still a strategic goal</li>
+    </ul>
+  </div>
+</section>
+
+<section id="cost">
+  <div class="shell-wide">
+    <h4>Cost</h4>
+    <h2>Rough planning estimate — not a quote</h2>
+
+    <h3 style="margin-top:var(--s5)">Team &amp; timeline for Phase 2 (financing MVP)</h3>
+    <p>3–5 people: one senior backend engineer owning the lending/fintech domain, one additional backend
+    engineer for KYC/payment integrations (reusing Upahar's Supabase/FastAPI patterns directly cuts this down
+    from generic industry estimates), one mobile/frontend engineer (lighter load if reusing the Upahar app
+    shell for the driver entry point), part-time product/compliance-ops (the NRB KYC/AML workstream is real
+    work, not overhead), part-time QA/DevOps. <strong>Roughly 4–7 months</strong> to a v1 — narrower than
+    generic 8–10 month industry estimates because of pattern reuse and a deliberately narrow scope.</p>
+
+    <h3 style="margin-top:var(--s5)">Rough engineering cost</h3>
+    <p>No Nepal-specific benchmark exists publicly. Using Asia-blended dev rates against a lending-app-sized
+    effort estimate (~2,000–2,500 hours) gives roughly <strong>$40K–$125K</strong> in engineering time for the
+    financing MVP alone; adding the commonly-cited 30–40% compliance overhead for a regulated product puts an
+    all-in planning range around <strong>$60K–$170K</strong> — likely lower with in-house Nepal-based salaries
+    rather than agency billing rates. Treat this as a bounding estimate for the planning conversation, not a
+    budget commitment. Phase 1 hardening work is comparatively small — days to low weeks of existing-team time,
+    not a separate budget line.</p>
+
+    <h3 style="margin-top:var(--s5)">Rough monthly infra cost at 1,000–5,000 driver scale (financing service only)</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Item</th><th>Monthly range</th><th>Basis</th></tr>
+        <tr><td>Supabase (Postgres + Storage + Auth), own project</td><td>$25–$600</td><td>Pro plan up, scales with usage</td></tr>
+        <tr><td>eKYC (DIY Textract/Rekognition)</td><td>$15–$75</td><td>~$0.07/verification × est. monthly new-driver volume</td></tr>
+        <tr><td>SMS (SparrowSMS, 5–10/driver/mo)</td><td>$40–$375</td><td>~NPR 0.85–1.4/SMS</td></tr>
+        <tr><td>Payment/collection fees</td><td>Near-zero if ConnectIPS/Fonepay-led; higher if card/wallet-load-heavy</td><td>See Financing → Payments</td></tr>
+        <tr><td>App/backend hosting</td><td>$20–$100</td><td>Small container/VM</td></tr>
+        <tr><td><strong>Rough total</strong></td><td><strong>~$150–$1,000+/month</strong></td><td>Most sensitive to eKYC vendor choice (vs. DIY) and payment-rail mix</td></tr>
+      </table>
+    </div>
+
+    <h3 style="margin-top:var(--s5)">Platform hardening / consolidation cost (not previously estimated)</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Item</th><th>Rough effort</th></tr>
+        <tr><td>Phase 1 low-hanging-fruit fixes (CORS, tests, backups, truncation fix, schema cleanup)</td><td>Days–2 weeks of existing-team time, no new infra spend</td></tr>
+        <tr><td>Express RDS/managed-DB migration</td><td>1–2 weeks engineering + a small new recurring RDS line item (roughly $15–60/month for a small instance at this scale)</td></tr>
+        <tr><td>Canonical identity layer (new shared service or API contract)</td><td>The single largest new-build item outside financing itself — realistically 4–8 weeks for a first version covering read access for Upahar + Express, longer if GPS Dashboard's access pattern is retired in the same phase</td></tr>
+        <tr><td>Cross-product analytics layer</td><td>2–4 weeks for a lightweight version (scheduled batch export into a dedicated Postgres or Supabase project); treat a full warehouse (BigQuery/Snowflake) as premature at this data volume</td></tr>
+        <tr><td>Express partner API (auth, rate limiting, webhooks, docs) + point-to-point delivery</td><td>4–6 weeks, can run in parallel with financing Phase 2/3</td></tr>
+      </table>
+    </div>
+
+    <h3 style="margin-top:var(--s5)">Key unresolved cost inputs</h3>
+    <ul class="tight">
+      <li>Actual Shufti Pro/FACEKI per-verification quotes (neither publishes pricing)</li>
+      <li>Actual negotiated eSewa/Khalti merchant fees</li>
+      <li>Whatever timeline/cost the regulatory path adds (BFI partnership negotiation vs. own-license pursuit) — the single biggest unknown, and outside engineering's control</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h4>Open questions for the business</h4>
+    <ol class="tight">
+      <li>Legal structuring path — gates down-payment minimums, repossession rights, and go-to-market timeline.</li>
+      <li>Capital source / lending partner — already in view, or does this design need to inform partner outreach?</li>
+      <li>Vehicle sourcing — bulk dealer/brand relationship, or drivers bring their own vehicle for refinancing?</li>
+      <li>Target down payment/tenure economics — Path A likely forces ≥40% down under NRB's LTV cap, Path B could go much lower.</li>
+      <li>Positioning vs. RYD Nepal specifically — displace them, differentiate on trust/UX/loyalty-tier terms, or room for both.</li>
+      <li>GitHub org/governance consolidation — resolve before a fifth product adds to the current two-org split.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  <div class="shell">Drivra Tech — internal strategy document. Not for external distribution.</div>
+</footer>
+
+</body>
+</html>

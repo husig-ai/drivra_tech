@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Architecture &amp; Platform Strategy — Drivra Tech</title>
+<link rel="icon" href="static/img/drivra-mark.png">
+<link rel="stylesheet" href="static/css/theme.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="wordmark"><img src="static/img/drivra-mark.png" alt="">Drivra <span class="tag">Tech</span></a>
+  <nav class="topnav">
+    <a href="index.html">Overview</a>
+    <a href="product.html">Product</a>
+    <a href="architecture.html" class="active">Architecture</a>
+    <a href="financing.html">Rent-to-Own</a>
+    <a href="roadmap.html">Roadmap &amp; Cost</a>
+  </nav>
+</div>
+
+<section class="hero" style="padding-bottom: var(--s6)">
+  <div class="shell">
+    <div class="eyebrow">Architecture &amp; Platform Strategy</div>
+    <h1>The vision: one source of truth for every driver</h1>
+    <p class="lede">Right now, "who is this driver, and what do we know about them" has three different
+    answers depending which product you ask — Upahar's Supabase project, Express's separate Postgres, and
+    whatever's cached in GPS Dashboard's browser session. Fintech mobility is next in line precisely because
+    it's the product that most needs a single honest answer to that question. This page is the current-state
+    audit, the debt inventory, and the investment plan to get there — not a rewrite of everything, but a
+    deliberate sequence of fixes and one piece of new shared infrastructure.</p>
+  </div>
+</section>
+
+<section style="padding-top:0" id="vision">
+  <div class="shell">
+    <h4>Vision</h4>
+    <h2>What "one source of truth" actually means here</h2>
+    <p>It does not mean one shared database — the opposite lesson is sitting in the codebase already:
+    Upahar and GPS Dashboard sharing one Supabase project is the single worst-behaved part of the whole
+    stack (see the debt inventory below). It means:</p>
+    <ol class="tight">
+      <li><strong>Each product keeps owning its operational data.</strong> Upahar owns rides/points, Express
+      owns orders/deliveries, Financing (new) owns loans/KYC. That's already mostly true and should stay true —
+      it's what makes each product independently deployable and lets a regulated product like Financing keep
+      its own security perimeter.</li>
+      <li><strong>One canonical driver identity, read by every product, owned by none of them individually.</strong>
+      Today a driver is a phone number, independently rows in Upahar's <code>drivers</code> table and Express's
+      <code>drivers_table</code>, with no link between them. A driver who rides for Yango <em>and</em> couriers
+      for Express is, as far as either system knows, two different people.</li>
+      <li><strong>A narrow, versioned API between products, never direct table access.</strong> This is the
+      specific fix for how GPS Dashboard currently works — reading and writing Upahar's production tables with
+      a client-side key is the pattern to retire, not extend to Express or Financing.</li>
+      <li><strong>A lightweight analytics/data-warehouse layer for cross-product signal, fed by each product's
+      own database, not queried live.</strong> This is what actually answers "what do we know about this
+      driver across everything" — for reporting today, and for credit scoring once Financing exists.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="current-state">
+  <div class="shell-wide">
+    <h4>Current state</h4>
+    <h2>What's actually running, confirmed by reading each repository</h2>
+    <div class="table-wrap" style="margin-top:var(--s5)">
+      <table>
+        <tr><th>Product</th><th>Repo / org</th><th>Stack</th><th>Database</th><th>Deploy</th></tr>
+        <tr><td><strong>Upahar</strong></td><td>husig-ai/yapigo</td><td>FastAPI, SQLAlchemy 2.0, Alembic, Jinja2+HTMX admin</td><td>Supabase Postgres (Mumbai), shared with GPS Dashboard</td><td>Single stateless EC2 container behind Caddy, GitHub Actions → ECR</td></tr>
+        <tr><td><strong>Express</strong></td><td>husig-ai/drivra_express_backend</td><td>FastAPI, SQLAlchemy 2.0, Alembic</td><td>Self-hosted Postgres 16, own Docker container</td><td>EC2 via ECR + AWS SSM, mirrors Upahar's pipeline pattern</td></tr>
+        <tr><td><strong>GPS Dashboard</strong></td><td>Drivra-Mobility/gps</td><td>Vanilla JS/HTML/CSS, Supabase JS client, Leaflet</td><td><strong>Upahar's Supabase project</strong> — no database of its own</td><td>Static hosting</td></tr>
+        <tr><td>GPS ETL</td><td>trakzee-supabase-etl (not in this workspace)</td><td>AWS Lambda</td><td>Writes into Upahar's Supabase project</td><td>Confirmed working — <span class="pill pill-brand">out of scope</span>, you're happy with it</td></tr>
+        <tr><td>Analytics tool</td><td>husig-ai/drivra</td><td>Single-file HTML + Chart.js</td><td>None — manual CSV upload</td><td>None, ad hoc</td></tr>
+        <tr><td>Marketing site</td><td>Drivra-Mobility/drivra-web</td><td>Static HTML/CSS/JS</td><td>None</td><td>Static hosting</td></tr>
+      </table>
+    </div>
+    <p style="margin-top:var(--s5)"><strong>Governance note:</strong> repos are split across two different
+    GitHub organizations (<code>husig-ai</code> and <code>Drivra-Mobility</code>) with no single infra-as-code
+    source of truth visible anywhere — worth deciding whether that's intentional (agency vs. client separation)
+    or an artifact of how this got built, before adding a fifth product.</p>
+  </div>
+</section>
+
+<section id="debts">
+  <div class="shell">
+    <h4>Debt inventory</h4>
+    <h2>What we're doing wrong, ranked by how much it matters</h2>
+
+    <h3 style="margin-top:var(--s6)">Critical — security, fix regardless of anything else</h3>
+    <div class="callout callout-critical">
+      <p><strong>Express's CORS policy is wide open</strong> — <code>allow_origins=["*"]</code> combined with
+      <code>allow_credentials=True</code>. This is a real vulnerability today, independent of the partner-API
+      work: any website can make authenticated requests against Express's API from a user's browser. Fix before
+      building the partner API layer on top of it, not after.</p>
+    </div>
+    <div class="callout callout-critical">
+      <p><strong>GPS Dashboard has unrestricted, direct, client-side access to Upahar's production tables</strong>
+      — a public anon key plus row-level security is the entire access-control boundary. This already caused
+      one incident (below) and is the architectural reason a "shared Supabase" pattern is unsafe to extend to
+      a fintech product. Not new: Upahar's own tables had this exact gap — <em>zero</em> RLS, fully open —
+      until a recent migration fixed it. GPS Dashboard is the one place the underlying pattern is still live.</p>
+    </div>
+
+    <h3 style="margin-top:var(--s6)">High — already causing real problems</h3>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Supabase egress quota exceeded</h3>
+        <p class="small">A real production incident: the shared free-tier Supabase project exceeded its 5GB/month
+        egress quota, traced to GPS Dashboard over-polling. Documented in GPS Dashboard's own code comments.
+        This is what "will Supabase scale the way we're using it" concretely means — it already didn't, once.</p>
+      </div>
+      <div class="card">
+        <h3>Silent data truncation</h3>
+        <p class="small">PostgREST's default 1,000-row response cap silently truncates GPS Dashboard's queries
+        on wide date ranges — a correctness bug, not just a performance one. Wide date-range reports may already
+        be wrong without anyone knowing.</p>
+      </div>
+      <div class="card">
+        <h3>Express has no managed backup story</h3>
+        <p class="small">Its Postgres runs in a container with a persistent volume directly on the EC2 instance
+        — the opposite of Upahar's deliberately stateless pattern ("nothing stateful lives on the instance").
+        No confirmed automated backup/PITR. If that instance is lost, order/merchant/wallet history goes with it.</p>
+      </div>
+      <div class="card">
+        <h3>Express has no test suite</h3>
+        <p class="small">Zero test files anywhere in the repo, versus Upahar's real suite. Combined with the
+        CORS gap and the schema-management issue below, this is the least production-hardened of the three
+        live products — worth knowing before it's the foundation for point-to-point delivery and partner APIs.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:var(--s6)">Moderate — real, but not urgent</h3>
+    <ul class="tight">
+      <li><strong>Express runs two competing schema sources on every startup</strong> — both
+      <code>Base.metadata.create_all()</code> and <code>alembic upgrade head</code> — which can silently diverge
+      from what its own migration history says the schema is.</li>
+      <li><strong>Duplicated gamification logic.</strong> Upahar and Express each independently built their own
+      points/badges/quests system. Not broken, but it's engineering effort spent twice on the same idea, and a
+      sign of how little these products currently share.</li>
+      <li><strong>No canonical driver identity across products</strong> — the core "one source of truth" gap.
+      Two databases, two <code>drivers</code> tables, no link, no shared ID.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="investments">
+  <div class="shell-wide">
+    <h4>What to actually do</h4>
+    <h2>Low-hanging fruit vs. real investment</h2>
+    <p>Sorted so the cheap, high-value fixes aren't waiting on the big structural ones — most of the left
+    column can happen this month without touching the right column at all.</p>
+    <div class="grid grid-2" style="margin-top:var(--s5)">
+      <div class="card" style="border-left:4px solid var(--brand-bright)">
+        <h4 style="color:var(--brand)">Low-hanging fruit — days, not months</h4>
+        <ul class="tight">
+          <li>Lock down Express's CORS policy to actual known origins</li>
+          <li>Pick one schema source of truth for Express (Alembic only; drop <code>create_all()</code> from startup)</li>
+          <li>Add a basic Express smoke-test suite — mirror Upahar's <code>tests/</code> pattern</li>
+          <li>Turn on automated Postgres backups for Express's database (even before any RDS migration — this alone closes the data-loss risk)</li>
+          <li>Fix GPS Dashboard's silent truncation with explicit pagination on wide-range queries</li>
+          <li>Write down the "every new table revokes anon/authenticated" rule as a checklist item for <em>any</em> new Supabase-backed service — including Financing</li>
+        </ul>
+      </div>
+      <div class="card" style="border-left:4px solid var(--info)">
+        <h4 style="color:var(--info)">Real investment — needs planning &amp; budget</h4>
+        <ul class="tight">
+          <li>Build the canonical driver-identity layer (§ above) — the actual "one source of truth" piece</li>
+          <li>Retire GPS Dashboard's direct table access in favor of a proper read API or a dedicated analytics replica</li>
+          <li>Migrate Express's database to a managed service (RDS or its own Supabase project) for real HA/backup guarantees</li>
+          <li>Build Express's partner API layer: auth, per-partner rate limiting, signed webhooks, idempotency, OpenAPI docs</li>
+          <li>Add point-to-point delivery as a distinct Express order type and matching path</li>
+          <li>Stand up the cross-product analytics/data-warehouse layer, fed by each product's DB on a schedule</li>
+          <li>Build the new Financing service (see <a href="financing.html">financing.html</a>)</li>
+          <li>Decide and consolidate GitHub org/governance structure</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="journey">
+  <div class="shell">
+    <h4>The full driver journey</h4>
+    <h2>Why fintech mobility is next in line, not a separate track</h2>
+    <p>This is the journey the "one source of truth" investment is actually in service of. Every step before
+    financing already exists in some form; financing is the first product that needs all of them working
+    together to underwrite a real decision.</p>
+    <div class="journey">
+      <div class="journey-step" data-n="1"><h4>A driver appears</h4><p>Via Yango's roster sync (Upahar) or Express's own onboarding — today, two unrelated events. Under the identity layer, this becomes one canonical driver record either product can attach to.</p></div>
+      <div class="journey-step" data-n="2"><h4>Activity builds a history</h4><p>Rides (Upahar) and/or deliveries (Express) accumulate tenure, earnings consistency, streaks — currently siloed per product, visible together only through the future analytics layer.</p></div>
+      <div class="journey-step" data-n="3"><h4>Eligibility surfaces</h4><p>A pre-check against that combined history — "you may be eligible to own your bike" — shown inside whichever app the driver already uses.</p></div>
+      <div class="journey-step" data-n="4"><h4>KYC &amp; underwriting</h4><p>New, in the Financing service: documents, guarantor for thin-file applicants, a rules-based scorecard reading the combined behavioral signal.</p></div>
+      <div class="journey-step" data-n="5"><h4>Ownership</h4><p>Installments, an always-visible ownership-progress tracker, and — later — the existing GPS Dashboard infrastructure doing double duty as asset monitoring on the financed vehicle.</p></div>
+    </div>
+    <p style="margin-top:var(--s5)">Full design for the step this document was actually asked to produce: <a href="financing.html">the rent-to-own financing system</a>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="shell">Drivra Tech — internal strategy document. Not for external distribution.</div>
+</footer>
+
+</body>
+</html>

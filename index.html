@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Drivra Tech — Platform &amp; Product Strategy</title>
+<meta name="description" content="Product and engineering strategy across Drivra Upahar, Drivra Express, GPS Dashboard, and the new rent-to-own driver financing line.">
+<link rel="icon" href="static/img/drivra-mark.png">
+<link rel="stylesheet" href="static/css/theme.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="wordmark"><img src="static/img/drivra-mark.png" alt="">Drivra <span class="tag">Tech</span></a>
+  <nav class="topnav">
+    <a href="index.html" class="active">Overview</a>
+    <a href="product.html">Product</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="financing.html">Rent-to-Own</a>
+    <a href="roadmap.html">Roadmap &amp; Cost</a>
+  </nav>
+</div>
+
+<section class="hero">
+  <div class="shell">
+    <div class="eyebrow">Internal · Private · Updated 2026-09-21</div>
+    <h1>Drivra's next product needs the platform underneath it to be honest first.</h1>
+    <p class="lede">Drivra Mobility runs three live products — Upahar (driver rewards), Express (B2B delivery),
+    and a GPS fleet dashboard — plus a marketing site and an ad hoc analytics tool, built up over roughly a
+    year by a small team across two GitHub organizations. This document was triggered by a new product idea
+    — <strong>rent-to-own motorcycle financing for drivers</strong> — but answering "what does that software
+    look like" honestly required first answering "what does everything we've already built actually look
+    like, and is it ready to carry a fintech product on top of it." Both answers are here.</p>
+    <div class="sectionnav">
+      <a href="product.html">Product portfolio &amp; driver journeys <small>Upahar, Express, GPS, and the new financing line</small></a>
+      <a href="architecture.html">Engineering audit <small>What's actually running, what's fragile, the consolidation plan</small></a>
+      <a href="financing.html">Rent-to-own deep dive <small>Competitive landscape, Nepal regulation, full system design</small></a>
+      <a href="roadmap.html">Roadmap &amp; cost <small>Phased plan tying it all together, rough budget</small></a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h4>The portfolio today</h4>
+    <h2>Four codebases, two GitHub orgs, one Supabase project doing more than it should</h2>
+    <p>Everything below was confirmed by reading the actual repositories, not inferred from documentation.</p>
+    <div class="grid grid-2" style="margin-top:var(--s5)">
+      <div class="card product-card status-live">
+        <span class="pill pill-brand">Live · husig-ai/yapigo</span>
+        <h3>Drivra Upahar</h3>
+        <p>Rewards/loyalty layer for Yango moto-taxi drivers in Nepal. FastAPI + SQLAlchemy + Supabase Postgres.
+        1,793 drivers on the roster, 14.6% active in the last 30 days. Points economy, tiers, quests, badges,
+        leaderboard. Reads Yango's Fleet API on a 15-minute sync; never writes back.</p>
+      </div>
+      <div class="card product-card status-live">
+        <span class="pill pill-brand">Live · husig-ai/drivra_express_backend</span>
+        <h3>Drivra Express</h3>
+        <p>B2B delivery platform for Kathmandu. FastAPI + SQLAlchemy, its own self-hosted Postgres (separate
+        from Upahar's Supabase project). Drivers, merchants, hubs, orders, wallet, its own independently-built
+        gamification system. Early-stage: 22 commits, no test suite yet.</p>
+      </div>
+      <div class="card product-card status-live">
+        <span class="pill pill-brand">Live · Drivra-Mobility/gps</span>
+        <h3>GPS Dashboard</h3>
+        <p>Fleet telematics — live map, idle/parked detection, misuse detection (GPS movement vs. Yango ride
+        records). Vanilla JS, no backend of its own: reads and writes <strong>directly into Upahar's Supabase
+        project</strong> via a client-side anon key and RLS. Fed by an external Lambda ETL.</p>
+      </div>
+      <div class="card product-card status-new">
+        <span class="pill pill-caution">New · this document</span>
+        <h3>Rent-to-Own Financing</h3>
+        <p>The product that started this exercise: let a driver finance their motorcycle through Drivra,
+        with an internal credit signal built from their Upahar (and potentially Express) activity history.
+        Proposed as a genuinely standalone service — see the <a href="financing.html">full design</a>.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-caution" style="margin-top:var(--s6)">
+      <h4>The headline finding</h4>
+      <p>Two of these four systems already share a database in a way that's caused a real production incident
+      (a Supabase egress-quota breach) and a documented security gap (unrestricted table access before RLS was
+      added). A new fintech product holding KYC documents and loan ledgers should not be built inside — or
+      adjacent to — that pattern without fixing it first. See <a href="architecture.html">Architecture</a> for
+      the specific findings and the consolidation plan.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h4>How to read this</h4>
+    <h2>Everything here traces back to a real file, a real commit, or a cited source</h2>
+    <div class="two-col" style="margin-top:var(--s5)">
+      <div><span class="pill pill-muted">Method</span></div>
+      <div>
+        <p>This isn't a speculative strategy memo. The product-portfolio and architecture sections come from
+        directly reading the five relevant repositories (<code>yapigo</code>, <code>drivra_express_backend</code>,
+        <code>gps_dashboard</code>, <code>drivra</code>, <code>drivra-web</code>) — their models, migrations,
+        deployment configs, and their own READMEs. The rent-to-own design draws on that same codebase reading
+        plus external research: competitor products (RYD Nepal, M-KOPA, Tugende, Watu, Moove), Nepal's lending
+        and KYC regulation (NRB/BAFIA), Nepal's payment rail landscape (eSewa, Khalti, Fonepay, ConnectIPS),
+        and rough cost/infra benchmarking. Where a number is a genuine estimate rather than a confirmed fact,
+        it's labeled as one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="shell">Drivra Tech — internal strategy document. Not for external distribution.</div>
+</footer>
+
+</body>
+</html>
