@@ -16,24 +16,30 @@ commit, so `git log` is the actual progress history.
 - [x] `index.html`, `product.html`, `architecture.html`, `financing.html`, `roadmap.html` — first
       complete draft of all five pages
 - [x] Repo created, first push
-
-## In progress
-- [ ] Independent re-verification pass on the load-bearing regulatory figures (NPR 300M capital, 60%
-      LTV cap, BAFIA §57 scope) against more authoritative sources — agent running, will fold in when back
-- [ ] Research on identity-layer architecture patterns (event-driven vs. CDC vs. batch ETL), AWS RDS
-      migration practicalities, and connection-pooling thresholds — same agent, feeds into `architecture.html`
+- [x] Independent re-verification pass on the load-bearing regulatory figures, against primary/authoritative
+      sources where findable (BAFIA §31 and §57 text, NRB Sixth Amendment to hire-purchase rules,
+      eSewa/Khalti developer docs directly). One real correction found and folded in: the "35-day notice"
+      comes from the Debt Recovery Act 2058, not BAFIA §57 itself. One important open question surfaced and
+      flagged prominently rather than guessed at: whether a hire-purchase company specifically has standing
+      under BAFIA §57 — needs a lawyer, not more research.
+- [x] Architecture-pattern research (identity layer, warehouse, RDS migration, connection pooling) — folded
+      into `architecture.html` and `roadmap.html`. Confirmed the right-sized approach is simpler than generic
+      enterprise patterns: one small identity service + plain API, batch ETL into one small Postgres reporting
+      DB, no Kafka/CDC/PgBouncer needed at this scale.
+- [x] Second commit/push with all corrections folded in
 
 ## Next
-- [ ] Fold verification-pass findings into `financing.html` (regulatory section) and `architecture.html`
-      (vision/identity-layer section) — correct anything that doesn't hold up, cite more precisely what does
-- [ ] Expand `architecture.html` with the concrete identity-layer design once the pattern research lands
-      (which of: dedicated identity service / event bus / CDC / batch ETL fits a team this size)
-- [ ] Add a proper `README.md` for the repo root
-- [ ] Enable GitHub Pages on this repo
+- [ ] Enable GitHub Pages on this repo — attempted via `gh api`, blocked by the local session's permission
+      classifier (treats it as a settings change needing explicit approval). Needs either Ayush's approval in
+      this session or manual toggle in Settings → Pages (Deploy from branch: `main`, path `/`).
 - [ ] Review pass: re-read all five pages together for consistency (cross-links, repeated numbers matching
-      across pages, no stale claims from earlier drafts)
-- [ ] Confirm with Ayush whether the specific Supabase project ref / literal config values should stay out
-      of the public site (currently kept narrative-only, no literal keys or project refs published)
+      across pages, no stale claims from earlier drafts) now that the correction pass has landed
+- [ ] Consider whether the Fonepay recurring-payment gap (couldn't find their dev docs at all) is worth a
+      direct outreach rather than leaving as "unresolved"
+- [ ] Optional: a short primary-source follow-up on the NRB Hire Purchase PDF itself
+      (nrb.org.np/contents/uploads/2026/08/Notice-1_Hire_Purchase.pdf) — WebFetch couldn't extract its text
+      (legacy Nepali font encoding); someone opening it directly or OCR'ing it would upgrade several Sixth
+      Amendment claims from secondary-source to primary-source confidence
 
 ## Explicitly out of scope for this pass
 - GPS ETL Lambda (`trakzee-supabase-etl`) — confirmed working, not being changed

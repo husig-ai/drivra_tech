@@ -157,9 +157,9 @@
       <table>
         <tr><th>Item</th><th>Rough effort</th></tr>
         <tr><td>Phase 1 low-hanging-fruit fixes (CORS, tests, backups, truncation fix, schema cleanup)</td><td>Days–2 weeks of existing-team time, no new infra spend</td></tr>
-        <tr><td>Express RDS/managed-DB migration</td><td>1–2 weeks engineering + a small new recurring RDS line item (roughly $15–60/month for a small instance at this scale)</td></tr>
-        <tr><td>Canonical identity layer (new shared service or API contract)</td><td>The single largest new-build item outside financing itself — realistically 4–8 weeks for a first version covering read access for Upahar + Express, longer if GPS Dashboard's access pattern is retired in the same phase</td></tr>
-        <tr><td>Cross-product analytics layer</td><td>2–4 weeks for a lightweight version (scheduled batch export into a dedicated Postgres or Supabase project); treat a full warehouse (BigQuery/Snowflake) as premature at this data volume</td></tr>
+        <tr><td>Express RDS migration</td><td><code>pg_dump</code>/restore during a maintenance window (right-sized for this DB's likely scale — AWS's DMS/logical-replication path is really for 250GB+ databases). 1–2 weeks engineering + ~$12–25/month for a small Single-AZ instance, likely covered by AWS's 12-month free tier if the account is eligible. Do the immediate ad hoc backup (Phase 1) regardless of when this lands.</td></tr>
+        <tr><td>Canonical identity layer (one small service, plain API — not an event bus)</td><td>Confirmed right-sized as a single service other products call synchronously, not Kafka/event-driven architecture. Realistically 4–8 weeks for a first version covering read access for Upahar + Express, longer if GPS Dashboard's access pattern is retired in the same phase</td></tr>
+        <tr><td>Cross-product analytics layer</td><td>2–4 weeks for a lightweight version: one small "reporting" Postgres database, batch-fed on a schedule, <code>postgres_fdw</code> for live cross-service reads where useful. A full warehouse (BigQuery/Snowflake/ClickHouse) or CDC/Debezium pipeline is confirmed premature at this data volume — revisit only if batch latency becomes an actual problem</td></tr>
         <tr><td>Express partner API (auth, rate limiting, webhooks, docs) + point-to-point delivery</td><td>4–6 weeks, can run in parallel with financing Phase 2/3</td></tr>
       </table>
     </div>
@@ -177,6 +177,7 @@
   <div class="shell">
     <h4>Open questions for the business</h4>
     <ol class="tight">
+      <li><strong>Whether a licensed hire-purchase company specifically gets BAFIA §57's fast repossession rights</strong>, as opposed to a full BAFIA Class C finance company — sources conflict, and this cannot be resolved by more research. Needs a Nepali banking/finance lawyer's direct read of Drivra's actual proposed structure. See <a href="financing.html#regulatory">Regulation</a>.</li>
       <li>Legal structuring path — gates down-payment minimums, repossession rights, and go-to-market timeline.</li>
       <li>Capital source / lending partner — already in view, or does this design need to inform partner outreach?</li>
       <li>Vehicle sourcing — bulk dealer/brand relationship, or drivers bring their own vehicle for refinancing?</li>

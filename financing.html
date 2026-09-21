@@ -130,19 +130,48 @@
     <p>Nepal Rastra Bank (NRB) regulation, not engineering choice, determines what's actually buildable:</p>
     <ul class="tight">
       <li>Under BAFIA, <strong>only a licensed BFI (Class A/B/C/D) may originate/hold consumer loans</strong> —
-      a pure tech company cannot lend directly.</li>
-      <li>Vehicle financing specifically sits under a <strong>Hire Purchase Company</strong> license:
-      <strong>NPR 300M</strong> minimum paid-up capital, a <strong>60% LTV cap (≥40% down payment required)</strong>,
-      service fee capped at 1%, overdue-penalty interest capped at <strong>2pp/year with no compounding</strong>,
-      single-borrower concentration limits, an NRB "fit and proper" test for founders/directors.</li>
+      a pure tech company cannot lend directly. Verified against the statute text itself, not just commentary:
+      <strong>BAFIA 2073, Chapter 6, Section 31</strong> — "No one, except the bank or financial institution
+      having obtained a license pursuant to Section 34, shall carry on banking or financial transactions
+      according to this Act."</li>
+      <li>Vehicle financing specifically sits under a <strong>Hire Purchase Company</strong> license, governed
+      by "Policy and Procedural Provisions for Granting Approval to Companies Providing Hire Purchase Loans,
+      2070," most recently updated by a <strong>Sixth Amendment (~Aug 2026, only weeks before this research)</strong>:
+      <strong>NPR 300M</strong> minimum paid-up capital (converging across multiple sources, high confidence),
+      a <strong>60% LTV cap (≥40% down payment)</strong> that the Sixth Amendment changed from an
+      independently-fixed hire-purchase number to one <em>cross-referenced against the general BFI vehicle-loan
+      LTV directive</em> — so it can move when that general directive moves, not only when hire-purchase rules
+      change directly. Also new in the Sixth Amendment: a cost-of-funds-based interest mechanism (replacing a
+      flat spread cap), 10-fiscal-year license renewal, a higher PAN-requirement threshold, and a mandatory
+      multi-brand financing requirement. <strong>One documented exception worth knowing:</strong> NRB approved
+      LTV up to 80% for businesses replacing vehicles damaged in the 2026 Gen-Z protests — narrow and
+      situational, not a general relief valve.</li>
       <li><strong>CIB Nepal</strong> (the credit bureau) is only accessible to NRB-registered BFIs.</li>
-      <li>A licensed BFI gets <strong>BAFIA §57</strong> self-help repossession — 35-day notice, no court order
-      needed, three public-auction attempts before Debt Recovery Tribunal for any residual. An unlicensed
-      lessor most likely only has ordinary contract/property remedies.</li>
+      <li><strong>Repossession is two separate legal instruments working together, not one</strong> — worth
+      getting right since it's easy to conflate. <strong>BAFIA §57</strong> is the substantive power: a
+      licensed BFI can auction mortgaged/pledged collateral without a court order on default. The commonly-cited
+      <strong>"35-day notice"</strong>, though, is <em>not</em> written into §57 itself — it comes from a
+      separate law, <strong>the Act on Recovery of Debts of Banks and Financial Institutions, 2058 (2002)</strong>,
+      read with Rule 4 of its 2059 Regulations. In practice they're used together (real published bank
+      repossession notices consistently cite the 35-day figure), but they're legally distinct instruments, and
+      the Debt Recovery Act explicitly doesn't apply below NPR 500,000 principal.</li>
       <li><strong>AML/KYC obligations apply regardless of structure:</strong> e-KYC with biometric verification
       under the Asset (Money) Laundering Prevention Act 2008; suspicious-transaction reports filed via goAML
       within <strong>3 days</strong>; records retained a minimum of <strong>5 years</strong>.</li>
     </ul>
+
+    <div class="callout callout-critical">
+      <h4>The single most load-bearing open legal question in this whole document</h4>
+      <p>Does a licensed <strong>hire-purchase company</strong> specifically — approved under a narrower
+      mechanism, Nepal Rastra Bank Act 2058 §76 — actually get to invoke BAFIA §57's self-help repossession
+      power? Sources conflict: some describe hire-purchase companies as licensed "Class C Finance Companies"
+      under BAFIA itself (which would carry §57 rights cleanly); others describe the NRB Act §76 approval as a
+      distinct status. This determines whether Path A's repossession story (fast, no-court-order, under BAFIA)
+      actually holds for Drivra's specific corporate form, or whether it falls back to the Secured Transactions
+      Act 2063's separate (non-BFI-specific) self-help remedy, or ordinary civil process. <strong>This cannot
+      be resolved by more research — it needs a Nepali banking/finance lawyer's direct read of Drivra's actual
+      proposed corporate structure</strong> before the business treats fast repossession as a given.</p>
+    </div>
 
     <div class="table-wrap" style="margin-top:var(--s5)">
       <table>
@@ -289,9 +318,15 @@
   <div class="shell">
     <h4>Payments &amp; collections</h4>
     <h2>No wallet in Nepal supports auto-debit — plan around that</h2>
-    <p>Confirmed: Nepali wallets (eSewa, Khalti, Fonepay) <strong>do not support auto-debit/recurring pull</strong>
-    — collection is a manual push each cycle. <strong>ConnectIPS/NCHL supports mandate-based direct debit</strong>,
-    already used for hire-purchase EMI collection — the best path to real automation for drivers with a bank account.</p>
+    <p>Confirmed directly against each provider's own developer documentation (not secondary commentary):
+    <strong>none of eSewa, Khalti, or Fonepay support true unattended auto-debit</strong>. eSewa's closest
+    product, "Generic Token Payment V2," still requires the customer to actively enter their token at eSewa on
+    <em>every</em> transaction — token-assisted, not silent. Khalti's ePayment Gateway docs show no
+    subscription/mandate capability at all (its "Smart Deposit" product is a wallet-side savings feature, not
+    merchant auto-charge). Fonepay's merchant API docs on this specifically weren't locatable — treat as
+    unresolved rather than confirmed absent. So in practice: collection is a manual push each cycle.
+    <strong>ConnectIPS/NCHL supports mandate-based direct debit</strong>, already used for hire-purchase EMI
+    collection — the best path to real automation for drivers with a bank account.</p>
     <p><strong>Fee comparison:</strong> ConnectIPS is flat and cheap (Rs 2–8/transaction regardless of amount,
     NRB bars passing this to customers); Fonepay QR is free for merchants; eSewa/Khalti card-based loading runs
     1.75–5%. <strong>Default drivers toward ConnectIPS or Fonepay QR; support eSewa/Khalti as fallback, not
