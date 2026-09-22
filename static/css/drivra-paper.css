@@ -1,0 +1,171 @@
+/* Drivra Tech on PaperCSS.
+   Loaded after paper.min.css. Overrides PaperCSS's color custom properties
+   with the Drivra brand palette, dials the default type scale down for a
+   dense report (PaperCSS ships 20px body / 4rem h1), and adds the
+   build-status system (good / needs rethinking / not built) used
+   throughout as badges, card edges and diagram fills. */
+
+html {
+  --primary: #0b6948;
+  --primary-dark: #06442e;
+  --primary-light: #cfe8dc;
+  --primary-light-10: #b7dcc9;
+  --primary-text: #06442e;
+  --primary-inverse: #fff;
+
+  --secondary: #2e4a62;
+  --secondary-dark: #1c2f3f;
+  --secondary-light: #dbe4ea;
+  --secondary-text: #1c2f3f;
+
+  --success: #1a7a42;
+  --success-dark: #14532d;
+  --success-light: #d7ecdf;
+  --success-text: #14532d;
+
+  --warning: #b26a00;
+  --warning-dark: #7a4900;
+  --warning-light: #f7e6c4;
+  --warning-text: #7a4900;
+
+  --danger: #b3261e;
+  --danger-dark: #7a1a15;
+  --danger-light: #f6d9d6;
+  --danger-text: #7a1a15;
+
+  --muted: #6b7280;
+  --muted-dark: #40454d;
+  --muted-light: #e5e7eb;
+  --muted-text: #4b5563;
+
+  --main-background: #faf9f6;
+  --main-background-light: #fff;
+
+  font-size: 17px;
+}
+
+body { background: var(--main-background); }
+
+h1, h2, h3, h4, h5, h6 { font-weight: normal; }
+h1 { font-size: 2.6rem; line-height: 1.15; }
+h2 { font-size: 1.9rem; line-height: 1.2; }
+h3 { font-size: 1.4rem; }
+h4 { font-size: 1.1rem; }
+h5.eyebrow, .eyebrow {
+  font-family: monospace, monospace;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-text);
+}
+p.lede { font-size: 1.25rem; color: var(--muted-text); max-width: 62ch; }
+
+a { color: var(--primary); }
+a:hover { color: var(--primary-dark); }
+
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 1.25rem; }
+.wrap-wide { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
+
+section { padding: 2.75rem 0; }
+section + section { border-top: 2px dashed var(--primary-light-10); }
+section.hero { padding-top: 2.75rem; }
+
+/* ---- top nav ---- */
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  padding: 0.75rem 1.25rem;
+  background: rgba(250, 249, 246, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 2px solid var(--primary);
+}
+.wordmark { display: flex; align-items: center; gap: 0.5rem; font-family: "Patrick Hand SC", sans-serif; font-size: 1.35rem; color: var(--primary-dark); text-decoration: none; }
+.wordmark:hover { color: var(--primary-dark); text-decoration: none; }
+.wordmark img { height: 28px; width: auto; display: block; }
+.wordmark .tag { color: var(--muted-text); font-size: 1rem; }
+.topnav { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+.topnav a { color: var(--muted-text); font-weight: normal; text-decoration: none; border-bottom: 2px solid transparent; padding-bottom: 2px; }
+.topnav a.active, .topnav a:hover { color: var(--primary); border-color: var(--primary); text-decoration: none; }
+
+/* ---- status system ---- */
+.badge.status-good { background-color: var(--success); color: #fff; }
+.badge.status-rethink { background-color: var(--warning); color: #fff; }
+.badge.status-missing { background-color: var(--muted); color: #fff; }
+.badge.status-critical { background-color: var(--danger); color: #fff; }
+
+.status-legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; font-size: 0.92rem; align-items: center; margin: 1rem 0; }
+.status-legend .dot { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 0.4rem; vertical-align: middle; }
+.dot-good { background: var(--success); }
+.dot-rethink { background: var(--warning); }
+.dot-missing { background: var(--muted); }
+.dot-critical { background: var(--danger); }
+
+.card.status-good { border-left: 6px solid var(--success); }
+.card.status-rethink { border-left: 6px solid var(--warning); }
+.card.status-missing { border-left: 6px solid var(--muted); }
+.card.status-critical { border-left: 6px solid var(--danger); }
+
+/* ---- diagrams ---- */
+.diagram {
+  background: #fff;
+  border: 2px solid var(--primary-light);
+  border-radius: 8px;
+  padding: 1rem 0.5rem;
+  margin: 1.25rem 0;
+  overflow-x: auto;
+}
+.diagram .mermaid { display: flex; justify-content: center; min-width: min-content; }
+.diagram-caption { font-size: 0.85rem; color: var(--muted-text); text-align: center; margin-top: -0.5rem; margin-bottom: 1.25rem; }
+
+/* ---- collapsibles (verbose detail, hidden by default) ---- */
+details.collapsible-plain {
+  border: 2px solid var(--primary-light);
+  border-radius: 8px;
+  margin: 1.25rem 0;
+  background: #fff;
+  overflow: hidden;
+}
+details.collapsible-plain > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.65rem 1rem;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-family: "Patrick Hand SC", sans-serif;
+  font-size: 1.05rem;
+}
+details.collapsible-plain > summary::-webkit-details-marker { display: none; }
+details.collapsible-plain > summary::before { content: "▸ "; }
+details.collapsible-plain[open] > summary::before { content: "▾ "; }
+details.collapsible-plain > summary ~ *:not(summary) { padding-left: 1rem; padding-right: 1rem; }
+details.collapsible-plain > summary ~ *:last-child { padding-bottom: 1rem; }
+
+/* ---- misc ---- */
+.pill-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 0.5rem 0 1rem; }
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin: 1.25rem 0; }
+.stat-box { border: 2px solid var(--primary-light); border-radius: 8px; padding: 0.85rem 1rem; background: #fff; }
+.stat-box .n { font-family: "Patrick Hand SC", sans-serif; font-size: 1.9rem; color: var(--primary-dark); display: block; }
+.stat-box .l { font-size: 0.85rem; color: var(--muted-text); }
+
+.sectionnav { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; }
+.sectionnav a {
+  flex: 1 1 200px; border: 2px solid var(--primary-light); border-radius: 8px;
+  padding: 0.75rem 1rem; text-decoration: none; color: var(--primary-dark);
+}
+.sectionnav a:hover { border-color: var(--primary); text-decoration: none; }
+.sectionnav small { display: block; color: var(--muted-text); font-size: 0.85rem; margin-top: 2px; }
+
+table { font-size: 0.95rem; }
+.table-wrap { border: 2px solid var(--primary-light); border-radius: 8px; overflow-x: auto; background: #fff; }
+.table-wrap table { margin: 0; }
+.table-wrap th { background: var(--primary-light); }
+
+footer { padding: 2rem 0 3rem; color: var(--muted-text); font-size: 0.85rem; }
+footer a { color: var(--muted-text); }
+
+@media (max-width: 760px) {
+  .topnav { display: none; }
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+}

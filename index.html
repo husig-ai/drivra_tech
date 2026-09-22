@@ -3,114 +3,367 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<title>Drivra Tech — Platform &amp; Product Strategy</title>
-<meta name="description" content="Product and engineering strategy across Drivra Upahar, Drivra Express, GPS Dashboard, and the new rent-to-own driver financing line.">
+<title>Drivra Tech: Platform &amp; Product Strategy</title>
+<meta name="description" content="Everything about Drivra's platform and the new rent-to-own financing product, on one page: what's built, what's fragile, what's not built yet, and what it costs.">
 <link rel="icon" href="static/img/drivra-mark.png">
-<link rel="stylesheet" href="static/css/theme.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/papercss@1.9.2/dist/paper.min.css">
+<link rel="stylesheet" href="static/css/drivra-paper.css">
 </head>
 <body>
 
-<div class="topbar">
+<nav class="topbar">
   <a href="index.html" class="wordmark"><img src="static/img/drivra-mark.png" alt="">Drivra <span class="tag">Tech</span></a>
-  <nav class="topnav">
+  <div class="topnav">
     <a href="index.html" class="active">Overview</a>
     <a href="product.html">Product</a>
     <a href="architecture.html">Architecture</a>
     <a href="financing.html">Rent-to-Own</a>
     <a href="roadmap.html">Roadmap &amp; Cost</a>
-  </nav>
-</div>
+  </div>
+</nav>
 
 <section class="hero">
-  <div class="shell">
-    <div class="eyebrow">Internal · Private · Updated 2026-09-21</div>
-    <h1>Drivra's next product needs the platform underneath it to be honest first.</h1>
-    <p class="lede">Drivra Mobility runs three live products — Upahar (driver rewards), Express (B2B delivery),
-    and a GPS fleet dashboard — plus a marketing site and an ad hoc analytics tool, built up over roughly a
-    year by a small team across two GitHub organizations. This document was triggered by a new product idea
-    — <strong>rent-to-own motorcycle financing for drivers</strong> — but answering "what does that software
-    look like" honestly required first answering "what does everything we've already built actually look
-    like, and is it ready to carry a fintech product on top of it." Both answers are here.</p>
-    <div class="sectionnav">
-      <a href="product.html">Product portfolio &amp; driver journeys <small>Upahar, Express, GPS, and the new financing line</small></a>
-      <a href="architecture.html">Engineering audit <small>What's actually running, what's fragile, the consolidation plan</small></a>
-      <a href="financing.html">Rent-to-own deep dive <small>Competitive landscape, Nepal regulation, full system design</small></a>
-      <a href="roadmap.html">Roadmap &amp; cost <small>Phased plan tying it all together, rough budget</small></a>
+  <div class="wrap">
+    <div class="eyebrow">Internal, private. Updated 2026-09-22</div>
+    <h1>The whole picture, on one page</h1>
+    <p class="lede">Drivra runs three live products built up over about a year, plus a new rent-to-own
+    financing product being designed now. This page is the complete summary: what exists, what's live
+    and fine, what's live but needs rethinking, what isn't built yet, and what the next six months cost.
+    The other pages go deeper on any one piece; you don't need them to get the full picture here.</p>
+
+    <div class="status-legend">
+      <span><span class="dot dot-good"></span>Built and fine</span>
+      <span><span class="dot dot-rethink"></span>Built, needs rethinking</span>
+      <span><span class="dot dot-missing"></span>Not built yet</span>
+      <span><span class="dot dot-critical"></span>Critical, fix now</span>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <h4 class="eyebrow">The portfolio</h4>
+    <h2>Four products, one driver</h2>
+    <p>The same person is, at different moments, a Yango moto-taxi driver earning Upahar points, an
+    Express courier between ride-hailing shifts, a dot on the GPS dashboard's map, and, if this launches,
+    someone paying down a motorcycle.</p>
+
+    <div class="row">
+      <div class="col sm-6">
+        <div class="card status-good">
+          <div class="card-body">
+            <div class="pill-row"><span class="badge status-good">Live, fine</span><span class="badge muted">husig-ai/yapigo</span></div>
+            <h3 class="card-title">Drivra Upahar</h3>
+            <p class="card-text small">Driver rewards. FastAPI + Supabase. 1,793 drivers on the roster,
+            261 active in the last 30 days (14.6%). Retention, not acquisition, is the constraint. The
+            most tested, most production-hardened piece of the stack.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col sm-6">
+        <div class="card status-rethink">
+          <div class="card-body">
+            <div class="pill-row"><span class="badge status-rethink">Live, needs rethinking</span><span class="badge muted">husig-ai/drivra_express_backend</span></div>
+            <h3 class="card-title">Drivra Express</h3>
+            <p class="card-text small">B2B delivery. Own Postgres, own gamification system built
+            independently of Upahar's. Early-stage: 22 commits, no test suite, no managed backups, and
+            a critical CORS gap (below). Needs partner APIs and point-to-point delivery before it can
+            grow past merchant/hub orders.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col sm-6">
+        <div class="card status-rethink">
+          <div class="card-body">
+            <div class="pill-row"><span class="badge status-rethink">Live, needs rethinking</span><span class="badge muted">Drivra-Mobility/gps</span></div>
+            <h3 class="card-title">GPS Dashboard</h3>
+            <p class="card-text small">Fleet telematics: live map, idle detection, and a genuinely useful
+            misuse-detection feature. No backend of its own: it reads and writes straight into Upahar's
+            Supabase tables with a public key, protected only by row-level security. That pattern is the
+            single biggest platform risk on this page.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col sm-6">
+        <div class="card status-missing">
+          <div class="card-body">
+            <div class="pill-row"><span class="badge status-missing">Not built</span><span class="badge muted">proposed, standalone</span></div>
+            <h3 class="card-title">Rent-to-Own Financing</h3>
+            <p class="card-text small">Let a driver finance their motorcycle through Drivra, using their
+            Upahar activity history as the credit signal instead of a bank file. The product this whole
+            document was triggered by. Full design on <a href="financing.html">Rent-to-Own</a>.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <section>
-  <div class="shell">
-    <h4>The portfolio today</h4>
-    <h2>Four codebases, two GitHub orgs, one Supabase project doing more than it should</h2>
-    <p>Everything below was confirmed by reading the actual repositories, not inferred from documentation.</p>
-    <div class="grid grid-2" style="margin-top:var(--s5)">
-      <div class="card product-card status-live">
-        <span class="pill pill-brand">Live · husig-ai/yapigo</span>
-        <h3>Drivra Upahar</h3>
-        <p>Rewards/loyalty layer for Yango moto-taxi drivers in Nepal. FastAPI + SQLAlchemy + Supabase Postgres.
-        1,793 drivers on the roster, 14.6% active in the last 30 days. Points economy, tiers, quests, badges,
-        leaderboard. Reads Yango's Fleet API on a 15-minute sync; never writes back.</p>
-      </div>
-      <div class="card product-card status-live">
-        <span class="pill pill-brand">Live · husig-ai/drivra_express_backend</span>
-        <h3>Drivra Express</h3>
-        <p>B2B delivery platform for Kathmandu. FastAPI + SQLAlchemy, its own self-hosted Postgres (separate
-        from Upahar's Supabase project). Drivers, merchants, hubs, orders, wallet, its own independently-built
-        gamification system. Early-stage: 22 commits, no test suite yet.</p>
-      </div>
-      <div class="card product-card status-live">
-        <span class="pill pill-brand">Live · Drivra-Mobility/gps</span>
-        <h3>GPS Dashboard</h3>
-        <p>Fleet telematics — live map, idle/parked detection, misuse detection (GPS movement vs. Yango ride
-        records). Vanilla JS, no backend of its own: reads and writes <strong>directly into Upahar's Supabase
-        project</strong> via a client-side anon key and RLS. Fed by an external Lambda ETL.</p>
-      </div>
-      <div class="card product-card status-new">
-        <span class="pill pill-caution">New · this document</span>
-        <h3>Rent-to-Own Financing</h3>
-        <p>The product that started this exercise: let a driver finance their motorcycle through Drivra,
-        with an internal credit signal built from their Upahar (and potentially Express) activity history.
-        Proposed as a genuinely standalone service — see the <a href="financing.html">full design</a>.</p>
+  <div class="wrap">
+    <h4 class="eyebrow">The headline finding</h4>
+    <h2>A fintech product can't be built on top of today's data pattern without fixing it first</h2>
+    <p>Two of the four systems above already share one database in a way that's caused a real production
+    incident and a documented security gap. A new product holding KYC documents and loan ledgers should
+    not sit inside, or next to, that pattern.</p>
+    <div class="alert alert-danger">
+      <strong>What actually happened:</strong> Upahar's own Supabase tables, including admin logins and
+      OTP codes, had zero row-level security until a recent migration closed it. GPS Dashboard still
+      reads and writes those tables directly from the browser with a public anon key, RLS is its only
+      access control. That same shared project already hit its free-tier egress quota once, traced to
+      GPS Dashboard over-polling. Full detail: <a href="architecture.html#debts">Architecture</a>.
+    </div>
+  </div>
+</section>
+
+<section id="landscape">
+  <div class="wrap-wide">
+    <h4 class="eyebrow">System landscape</h4>
+    <h2>What's actually running today, confirmed by reading each repository</h2>
+    <p>Four repos, two GitHub organizations, one Supabase project doing more than it should.</p>
+    <div class="diagram">
+      <div class="mermaid">
+flowchart TB
+  YF["Yango Fleet API<br/>external"]
+  UP["Upahar<br/>FastAPI + SQLAlchemy"]
+  EX["Express<br/>FastAPI + SQLAlchemy"]
+  GPS["GPS Dashboard<br/>static JS, no backend"]
+  ETL["GPS ETL Lambda<br/>trakzee-supabase-etl"]
+  SB[("Supabase Postgres<br/>shared: Upahar + GPS")]
+  PG[("Express Postgres<br/>self-hosted, own EC2")]
+
+  YF -->|15-min read-only sync| UP
+  UP --> SB
+  GPS -->|anon key + RLS<br/>direct read/write| SB
+  ETL -->|fleet positions, ~1/min| SB
+  EX --> PG
+
+  classDef good fill:#d7ecdf,stroke:#1a7a42,color:#14532d,stroke-width:2px;
+  classDef rethink fill:#f7e6c4,stroke:#b26a00,color:#7a4900,stroke-width:2px;
+  classDef missing fill:#e5e7eb,stroke:#6b7280,color:#374151,stroke-width:2px;
+  class YF,UP,ETL good;
+  class EX,GPS,SB,PG rethink;
       </div>
     </div>
+    <p class="diagram-caption">Green: built and fine. Amber: built, needs rethinking. The shared Supabase
+    project and Express's unmanaged Postgres are the two amber boxes worth the most attention.</p>
 
-    <div class="callout callout-caution" style="margin-top:var(--s6)">
-      <h4>The headline finding</h4>
-      <p>Two of these four systems already share a database in a way that's caused a real production incident
-      (a Supabase egress-quota breach) and a documented security gap (unrestricted table access before RLS was
-      added). A new fintech product holding KYC documents and loan ledgers should not be built inside — or
-      adjacent to — that pattern without fixing it first. See <a href="architecture.html">Architecture</a> for
-      the specific findings and the consolidation plan.</p>
+    <details class="collapsible-plain">
+      <summary>Full repo, org, stack and deploy table</summary>
+      <div class="table-wrap" style="margin-top:1rem">
+        <table>
+          <tr><th>Product</th><th>Repo / org</th><th>Stack</th><th>Deploy</th></tr>
+          <tr><td>Upahar</td><td>husig-ai/yapigo</td><td>FastAPI, SQLAlchemy 2.0, Alembic, Jinja2 + HTMX admin</td><td>Single stateless EC2 container behind Caddy, GitHub Actions to ECR</td></tr>
+          <tr><td>Express</td><td>husig-ai/drivra_express_backend</td><td>FastAPI, SQLAlchemy 2.0, Alembic</td><td>EC2 via ECR + AWS SSM, mirrors Upahar's pipeline</td></tr>
+          <tr><td>GPS Dashboard</td><td>Drivra-Mobility/gps</td><td>Vanilla JS/HTML/CSS, Supabase JS client, Leaflet</td><td>Static hosting</td></tr>
+          <tr><td>GPS ETL</td><td>trakzee-supabase-etl (not in this workspace)</td><td>AWS Lambda</td><td>Confirmed working, out of scope</td></tr>
+          <tr><td>Analytics tool</td><td>husig-ai/drivra</td><td>Single-file HTML + Chart.js</td><td>None, ad hoc, manual CSV upload</td></tr>
+          <tr><td>Marketing site</td><td>Drivra-Mobility/drivra-web</td><td>Static HTML/CSS/JS</td><td>Static hosting</td></tr>
+        </table>
+      </div>
+      <p class="small" style="margin-top:0.75rem">Repos split across two GitHub orgs (husig-ai and
+      Drivra-Mobility) with no single infra-as-code source of truth: worth deciding if that's intentional
+      before a fifth product adds to it.</p>
+    </details>
+  </div>
+</section>
+
+<section id="debts">
+  <div class="wrap">
+    <h4 class="eyebrow">Debt inventory</h4>
+    <h2>What's wrong, ranked by how much it matters</h2>
+
+    <div class="alert alert-danger">
+      <strong>Critical, fix regardless of anything else.</strong>
+      <ul class="tight">
+        <li>Express's CORS policy is wide open: <code>allow_origins=["*"]</code> plus
+        <code>allow_credentials=True</code>. Any website can make authenticated requests against Express
+        today.</li>
+        <li>GPS Dashboard has unrestricted, direct, client-side access to Upahar's production tables. A
+        public anon key plus RLS is the entire access-control boundary.</li>
+      </ul>
+    </div>
+    <div class="alert alert-warning">
+      <strong>High, already causing real problems.</strong>
+      <ul class="tight">
+        <li>Supabase egress quota was exceeded once already, traced to GPS Dashboard over-polling.</li>
+        <li>PostgREST's 1,000-row response cap silently truncates GPS Dashboard's wide-date-range queries:
+        a correctness bug, not just a performance one.</li>
+        <li>Express has no managed backup story: Postgres on a container volume, no confirmed automated
+        backup.</li>
+        <li>Express has zero test files anywhere in the repo.</li>
+      </ul>
+    </div>
+    <details class="collapsible-plain">
+      <summary>Moderate issues, and the full fix plan</summary>
+      <ul class="tight" style="margin-top:1rem">
+        <li>Express runs two competing schema sources on every startup (<code>create_all()</code> and
+        Alembic), which can silently diverge.</li>
+        <li>Upahar and Express each independently built their own points/badges/quests system: duplicated
+        effort, not broken.</li>
+        <li>No canonical driver identity across products: two databases, two <code>drivers</code> tables,
+        no link.</li>
+      </ul>
+      <p style="margin-top:1rem">Full ranked list with the specific low-lift fixes and the larger
+      investments: <a href="architecture.html#investments">Architecture</a>.</p>
+    </details>
+  </div>
+</section>
+
+<section id="vision">
+  <div class="wrap">
+    <h4 class="eyebrow">The vision</h4>
+    <h2>One canonical driver identity, not one shared database</h2>
+    <p>The fix is not a bigger shared database: Upahar and GPS Dashboard already sharing one is the
+    worst-behaved part of the stack. The fix is narrower and smaller than that.</p>
+    <div class="row">
+      <div class="col sm-6 md-3">
+        <div class="stat-box"><span class="n">1</span><span class="l">Each product keeps owning its
+        own operational data</span></div>
+      </div>
+      <div class="col sm-6 md-3">
+        <div class="stat-box"><span class="n">2</span><span class="l">One canonical driver identity,
+        read by every product, owned by none</span></div>
+      </div>
+      <div class="col sm-6 md-3">
+        <div class="stat-box"><span class="n">3</span><span class="l">A narrow, versioned API between
+        products, never direct table access</span></div>
+      </div>
+      <div class="col sm-6 md-3">
+        <div class="stat-box"><span class="n">4</span><span class="l">A small batch-fed reporting
+        database for cross-product signal</span></div>
+      </div>
+    </div>
+    <p style="margin-top:1rem">This is deliberately right-sized: a small identity service behind a plain
+    API, no message bus; one small Postgres reporting database, no warehouse product. That's confirmed
+    against what teams at this scale actually adopt, not an enterprise default. Full reasoning and the
+    "explicitly not needed yet" list: <a href="architecture.html#vision">Architecture</a>.</p>
+  </div>
+</section>
+
+<section id="financing-summary">
+  <div class="wrap">
+    <h4 class="eyebrow">The new product</h4>
+    <h2>Rent-to-own motorcycle financing</h2>
+    <p>A local competitor, RYD Nepal, already runs this model with no app and no credit check. Drivra's
+    edge: this can live <em>inside</em> an app drivers already use daily, where real earnings and tenure
+    history, not a bank statement, drive approval and terms.</p>
+
+    <div class="row">
+      <div class="col sm-4">
+        <div class="card"><div class="card-body">
+          <h4 class="card-title">Regulation decides the shape</h4>
+          <p class="small">Only a licensed lender may originate consumer loans in Nepal (BAFIA §31).
+          Recommended path: partner with a licensed hire-purchase company (Path A), Drivra as the
+          distribution and underwriting-data layer. Avoids a NPR 300M capital bar; still needs
+          counsel to confirm repossession rights for Drivra's specific structure.</p>
+        </div></div>
+      </div>
+      <div class="col sm-4">
+        <div class="card"><div class="card-body">
+          <h4 class="card-title">System design</h4>
+          <p class="small">Standalone service, own repo, own Postgres, own Supabase project (never
+          shared with Upahar/GPS). Reuses Upahar's proven FastAPI + SQLAlchemy + Alembic stack. DIY
+          Textract + Rekognition eKYC at roughly $0.07/verification, about 30 to 100 times cheaper than
+          a global vendor.</p>
+        </div></div>
+      </div>
+      <div class="col sm-4">
+        <div class="card"><div class="card-body">
+          <h4 class="card-title">Credit scoring v1</h4>
+          <p class="small">Rules-based scorecard, not ML: tenure, earnings consistency, streaks, tier,
+          all already in Upahar. Cold-start applicants get a guarantor or higher down payment instead
+          of a decline. No telematics/remote-disable in v1: reputational risk outweighs the benefit this
+          early.</p>
+        </div></div>
+      </div>
+    </div>
+    <p style="margin-top:0.5rem">Full competitive research, the regulatory citations, the data model,
+    and the payments design: <a href="financing.html">Rent-to-Own</a>.</p>
+  </div>
+</section>
+
+<section id="roadmap-summary">
+  <div class="wrap-wide">
+    <h4 class="eyebrow">Roadmap</h4>
+    <h2>One sequence, not four separate projects</h2>
+    <p>Platform hardening and the financing product aren't competing priorities. The hardening work is
+    what makes the financing product's credit signal trustworthy.</p>
+    <div class="diagram">
+      <div class="mermaid">
+flowchart LR
+  P0["Phase 0<br/>Legal + diligence<br/>parallel, starts now"]
+  P1["Phase 1<br/>Harden &amp; consolidate<br/>days to 2 weeks"]
+  P2["Phase 2<br/>Identity layer + MVP financing<br/>~4 to 7 months"]
+  P3["Phase 3<br/>Automate scoring &amp; payments"]
+  P4["Phase 4<br/>Scale"]
+  P0 --> P1 --> P2 --> P3 --> P4
+  classDef now fill:#cfe8dc,stroke:#0b6948,color:#06442e,stroke-width:2px;
+  classDef next fill:#dbe4ea,stroke:#2e4a62,color:#1c2f3f,stroke-width:2px;
+  class P0,P1 now;
+  class P2,P3,P4 next;
+      </div>
+    </div>
+    <p class="diagram-caption">Green: starting now. Blue: sequenced after. Full phase content:
+    <a href="roadmap.html">Roadmap &amp; Cost</a>.</p>
+
+    <div class="row" style="margin-top:1rem">
+      <div class="col sm-6">
+        <div class="stat-box">
+          <span class="n">$65/mo</span>
+          <span class="l">Infra cost for the first 6 months, at Phase 2's pilot scale (10 to 20
+          drivers), from the architecture actually decided above, not a scaled-up guess.</span>
+        </div>
+      </div>
+      <div class="col sm-6">
+        <div class="stat-box">
+          <span class="n">~4 to 7 mo</span>
+          <span class="l">Team and timeline to a financing v1: 3 to 5 people, reusing Upahar's stack
+          directly. Full cost breakdown: <a href="roadmap.html#cost">Roadmap &amp; Cost</a>.</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <section>
-  <div class="shell">
-    <h4>How to read this</h4>
+  <div class="wrap">
+    <h4 class="eyebrow">How to read this</h4>
     <h2>Everything here traces back to a real file, a real commit, or a cited source</h2>
-    <div class="two-col" style="margin-top:var(--s5)">
-      <div><span class="pill pill-muted">Method</span></div>
-      <div>
-        <p>This isn't a speculative strategy memo. The product-portfolio and architecture sections come from
-        directly reading the five relevant repositories (<code>yapigo</code>, <code>drivra_express_backend</code>,
-        <code>gps_dashboard</code>, <code>drivra</code>, <code>drivra-web</code>) — their models, migrations,
-        deployment configs, and their own READMEs. The rent-to-own design draws on that same codebase reading
-        plus external research: competitor products (RYD Nepal, M-KOPA, Tugende, Watu, Moove), Nepal's lending
-        and KYC regulation (NRB/BAFIA), Nepal's payment rail landscape (eSewa, Khalti, Fonepay, ConnectIPS),
-        and rough cost/infra benchmarking. Where a number is a genuine estimate rather than a confirmed fact,
-        it's labeled as one.</p>
-      </div>
-    </div>
+    <details class="collapsible-plain">
+      <summary>Method, and what's a fact versus an estimate</summary>
+      <p style="margin-top:1rem">This isn't a speculative strategy memo. The product-portfolio and
+      architecture sections come from directly reading the five relevant repositories
+      (<code>yapigo</code>, <code>drivra_express_backend</code>, <code>gps_dashboard</code>,
+      <code>drivra</code>, <code>drivra-web</code>): their models, migrations, deployment configs, and
+      their own READMEs. The rent-to-own design draws on that same codebase reading plus external
+      research: competitor products (RYD Nepal, M-KOPA, Tugende, Watu, Moove), Nepal's lending and KYC
+      regulation (NRB/BAFIA), Nepal's payment rail landscape (eSewa, Khalti, Fonepay, ConnectIPS), and
+      cost/infra benchmarking. Where a number is a genuine estimate rather than a confirmed fact, it's
+      labeled as one.</p>
+    </details>
   </div>
 </section>
 
 <footer>
-  <div class="shell">Drivra Tech — internal strategy document. Not for external distribution.</div>
+  <div class="wrap">Drivra Tech: internal strategy document. Not for external distribution.</div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    look: 'handDrawn',
+    theme: 'neutral',
+    themeVariables: {
+      fontFamily: 'Neucha, sans-serif',
+      primaryColor: '#cfe8dc',
+      primaryTextColor: '#06442e',
+      primaryBorderColor: '#0b6948',
+      lineColor: '#2e4a62'
+    },
+    flowchart: { htmlLabels: true, curve: 'basis' }
+  });
+</script>
 </body>
 </html>

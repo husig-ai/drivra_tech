@@ -3,151 +3,212 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<title>Product Portfolio — Drivra Tech</title>
+<title>Product Portfolio: Drivra Tech</title>
 <link rel="icon" href="static/img/drivra-mark.png">
-<link rel="stylesheet" href="static/css/theme.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/papercss@1.9.2/dist/paper.min.css">
+<link rel="stylesheet" href="static/css/drivra-paper.css">
 </head>
 <body>
 
-<div class="topbar">
+<nav class="topbar">
   <a href="index.html" class="wordmark"><img src="static/img/drivra-mark.png" alt="">Drivra <span class="tag">Tech</span></a>
-  <nav class="topnav">
+  <div class="topnav">
     <a href="index.html">Overview</a>
     <a href="product.html" class="active">Product</a>
     <a href="architecture.html">Architecture</a>
     <a href="financing.html">Rent-to-Own</a>
     <a href="roadmap.html">Roadmap &amp; Cost</a>
-  </nav>
-</div>
+  </div>
+</nav>
 
-<section class="hero" style="padding-bottom: var(--s6)">
-  <div class="shell">
+<section class="hero">
+  <div class="wrap">
     <div class="eyebrow">Product</div>
     <h1>Four products, one driver</h1>
-    <p class="lede">The same person is, at different moments, a Yango moto-taxi driver earning Upahar points,
-    an Express courier between ride-hailing shifts, a dot on the GPS dashboard's map, and — if this launches
-    — someone paying down a motorcycle. The portfolio only compounds if these actually connect.</p>
+    <p class="lede">The same person is, at different moments, a Yango moto-taxi driver earning Upahar
+    points, an Express courier between ride-hailing shifts, a dot on the GPS dashboard's map, and, if
+    this launches, someone paying down a motorcycle. The portfolio only compounds if these actually
+    connect.</p>
+    <div class="status-legend">
+      <span><span class="dot dot-good"></span>Built and fine</span>
+      <span><span class="dot dot-rethink"></span>Built, needs rethinking</span>
+      <span><span class="dot dot-missing"></span>Not built yet</span>
+    </div>
   </div>
 </section>
 
 <section style="padding-top:0">
-  <div class="shell">
-    <h2>1. Drivra Upahar — driver rewards</h2>
-    <p><span class="pill pill-brand">Live</span> <span class="pill pill-muted">husig-ai/yapigo</span></p>
-    <p>Every rupee of completed fare earns 1 point. Points buy real goods (momo, gloves, a raincoat, rice) at
-    a fixed catalogue, funded by Drivra's ~3% commission on the fares that earn them. Confirmed live status:
-    1,793 riders on the roster, only <strong>261 active in the last 30 days (14.6%)</strong> — a median active
-    rider works 6 days a month for NPR 5,509. Retention, not acquisition, is the constraint.</p>
-    <div class="journey">
-      <div class="journey-step" data-n="1"><h4>Sign-in</h4><p>Phone number Yango already has, no password on first run — a rider row exists before anyone opens the app, mirrored from Yango's roster.</p></div>
-      <div class="journey-step" data-n="2"><h4>Today screen</h4><p>Points balance paired with the next thing it buys; five daily/weekly/monthly quests set at a level ~60% of active riders clear.</p></div>
-      <div class="journey-step" data-n="3"><h4>Progress</h4><p>Tier ladder (Bronze→Everest) on lifetime earnings, badges as countable milestones ("47/100"), streaks for consecutive days worked.</p></div>
-      <div class="journey-step" data-n="4"><h4>Redeem</h4><p>Spend points against the catalogue, collect at the fleet office against a voucher code — an admin-run fulfilment queue, not automated dispatch.</p></div>
+  <div class="wrap">
+    <h2>1. Drivra Upahar: driver rewards</h2>
+    <div class="pill-row">
+      <span class="badge status-good">Built and fine</span>
+      <span class="badge muted">husig-ai/yapigo</span>
     </div>
-  </div>
-</section>
+    <p>Every rupee of completed fare earns 1 point. Points buy real goods (momo, gloves, a raincoat,
+    rice) at a fixed catalogue, funded by Drivra's roughly 3% commission on the fares that earn them.
+    1,793 riders on the roster, only 261 active in the last 30 days (14.6%): a median active rider works
+    6 days a month for NPR 5,509. Retention, not acquisition, is the constraint.</p>
 
-<section>
-  <div class="shell">
-    <h2>2. Drivra Express — B2B delivery</h2>
-    <p><span class="pill pill-brand">Live</span> <span class="pill pill-muted">husig-ai/drivra_express_backend</span></p>
-    <p>A Kathmandu B2B delivery platform: merchants, hubs, drivers, and orders with pickup/delivery legs and
-    COD settlement. Its own Postgres, its own gamification system built independently of Upahar's (a second,
-    parallel badges/quests implementation — see <a href="architecture.html">Architecture</a> for why that's
-    worth consolidating). Early-stage: 22 commits, two contributors, no test suite yet, one squashed migration.</p>
-
-    <div class="callout callout-caution">
-      <h4>Two product requirements raised for this document, not yet built</h4>
-      <p><strong>Point-to-point delivery.</strong> Express's current model is merchant/hub-centric (a business
-      posts an order, a driver moves it through a hub). Point-to-point — an arbitrary pickup address to an
-      arbitrary dropoff address, no merchant or hub in the loop — is a distinct job type: it needs its own
-      pricing (distance/time-based, not merchant-negotiated), its own matching logic (nearest available driver
-      to the pickup point, not hub-queue-based), and a lighter-weight order model that doesn't assume a
-      merchant relationship exists.</p>
-      <p><strong>Partner APIs.</strong> Express needs to let outside parties — e-commerce platforms, restaurants,
-      other apps — create and track deliveries programmatically, not just through Drivra's own merchant portal.
-      That means a real partner-facing API surface: API keys (or OAuth client-credentials) issued per partner,
-      per-partner <strong>rate limiting</strong>, request signing or a shared secret on webhooks so delivery-status
-      callbacks can't be spoofed, idempotency keys on order-creation so a retried request can't double-book a
-      driver, and versioned, documented endpoints (OpenAPI) so a partner integration doesn't break silently on
-      a backend change. None of this exists yet — today's CORS policy is <code>allow_origins=["*"]</code> with
-      credentials allowed, which is the opposite of a partner-safe boundary and needs fixing before any partner
-      API ships, not after.</p>
-    </div>
-
-    <div class="journey">
-      <div class="journey-step" data-n="1"><h4>Merchant posts an order</h4><p>Today: through Express's own merchant-facing flow. Needed: also via a partner API, with the partner's system as the order source of truth for status updates.</p></div>
-      <div class="journey-step" data-n="2"><h4>Driver assignment</h4><p>Hub-based today. Point-to-point needs proximity-based matching independent of hub queues.</p></div>
-      <div class="journey-step" data-n="3"><h4>Delivery &amp; COD settlement</h4><p>Pickup/delivery leg split, wallet-based settlement for cash-on-delivery orders.</p></div>
-      <div class="journey-step" data-n="4"><h4>Partner visibility (needed)</h4><p>Status webhooks back to the originating partner, authenticated and rate-limited, so a partner never has to poll.</p></div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="shell">
-    <h2>3. GPS Dashboard — fleet telematics</h2>
-    <p><span class="pill pill-brand">Live</span> <span class="pill pill-muted">Drivra-Mobility/gps</span></p>
-    <p>A live map, idle/parked-state detection via geofencing, and a genuinely useful "misuse detection" feature
-    that cross-references GPS movement against Yango ride records to flag drivers going off-app. No backend of
-    its own — it's a static, client-side app that reads and writes straight into Upahar's Supabase tables using
-    a public anon key, protected only by row-level security policies. Data arrives via an external Lambda ETL
-    (<code>trakzee-supabase-etl</code>) polling the fleet roughly once a minute — confirmed working and out of
-    scope for change here (see <a href="architecture.html">Architecture</a> for why this is the one piece of
-    the current stack explicitly not being touched).</p>
-    <p>This is also the most directly reusable asset for the rent-to-own product: once a motorcycle is financed,
-    its GPS trail is exactly the telematics signal an East African competitor (Moove, M-KOPA) would build fresh —
-    Drivra already has it running, for a different purpose, on a different product. See <a href="financing.html#scoring">credit scoring</a>.</p>
-  </div>
-</section>
-
-<section>
-  <div class="shell">
-    <h2>4. Rent-to-Own Financing — new</h2>
-    <p><span class="pill pill-caution">New</span> <span class="pill pill-muted">proposed: standalone service</span></p>
-    <p>Let a driver finance their motorcycle through Drivra instead of a bank or the direct local competitor
-    (RYD Nepal). The pitch that makes this different from every competitor researched: it's the only rent-to-own
-    offer that can sit <em>inside</em> an app the driver already uses daily, where their real earnings and
-    tenure history — not a bank statement — can translate into faster approval and better terms. Full product
-    and system design: <a href="financing.html">financing.html</a>.</p>
-    <div class="grid grid-3">
-      <div class="card">
-        <h3>Discovery → application</h3>
-        <p class="small">Eligibility pre-check against existing Upahar tenure/performance data, before any paperwork.</p>
-      </div>
-      <div class="card">
-        <h3>KYC → underwriting</h3>
-        <p class="small">Citizenship + NID + license + selfie; rules-based scorecard from internal behavioral data.</p>
-      </div>
-      <div class="card">
-        <h3>Servicing → ownership</h3>
-        <p class="small">Installments, an always-visible ownership-progress tracker, completion or default handling.</p>
+    <div class="diagram">
+      <div class="mermaid">
+flowchart LR
+  A["Sign-in<br/>phone number Yango<br/>already has, no password"] --> B["Today screen<br/>points balance +<br/>5 daily/weekly/monthly quests"]
+  B --> C["Progress<br/>tier ladder, badges,<br/>work-day streaks"]
+  C --> D["Redeem<br/>spend points, collect<br/>at fleet office by voucher"]
+  classDef good fill:#d7ecdf,stroke:#1a7a42,color:#14532d,stroke-width:2px;
+  class A,B,C,D good;
       </div>
     </div>
+    <p class="diagram-caption">Redeem is an admin-run fulfilment queue today, not automated dispatch.</p>
   </div>
 </section>
 
 <section>
-  <div class="shell">
-    <h4>Portfolio strategy</h4>
+  <div class="wrap">
+    <h2>2. Drivra Express: B2B delivery</h2>
+    <div class="pill-row">
+      <span class="badge status-rethink">Built, needs rethinking</span>
+      <span class="badge muted">husig-ai/drivra_express_backend</span>
+    </div>
+    <p>A Kathmandu B2B delivery platform: merchants, hubs, drivers, and orders with pickup/delivery legs
+    and COD settlement. Its own Postgres, its own gamification system built independently of Upahar's (a
+    second, parallel badges/quests implementation, see <a href="architecture.html">Architecture</a> for
+    why that's worth consolidating). Early-stage: 22 commits, two contributors, no test suite yet, one
+    squashed migration.</p>
+
+    <div class="diagram">
+      <div class="mermaid">
+flowchart LR
+  A["Merchant posts order<br/>today: Express's own flow"] --> B["Driver assignment<br/>hub-based today"]
+  B --> C["Delivery &amp; COD settlement<br/>pickup/delivery split, wallet"]
+  C --> D["Partner visibility<br/>not built: status webhooks"]
+  classDef good fill:#d7ecdf,stroke:#1a7a42,color:#14532d,stroke-width:2px;
+  classDef missing fill:#e5e7eb,stroke:#6b7280,color:#374151,stroke-width:2px;
+  class A,B,C good;
+  class D missing;
+      </div>
+    </div>
+
+    <details class="collapsible-plain">
+      <summary>Two product requirements raised here, not yet built</summary>
+      <p style="margin-top:1rem"><strong>Point-to-point delivery.</strong> Express's current model is
+      merchant/hub-centric (a business posts an order, a driver moves it through a hub). Point-to-point,
+      an arbitrary pickup address to an arbitrary dropoff, no merchant or hub in the loop, is a distinct
+      job type: its own pricing (distance/time-based, not merchant-negotiated), its own matching (nearest
+      available driver to the pickup point, not hub-queue-based), and a lighter order model that doesn't
+      assume a merchant relationship exists.</p>
+      <p><strong>Partner APIs.</strong> Express needs to let outside parties (e-commerce platforms,
+      restaurants, other apps) create and track deliveries programmatically, not just through Drivra's
+      own merchant portal. That means a real partner-facing API surface: API keys or OAuth
+      client-credentials issued per partner, per-partner rate limiting, request signing or a shared
+      secret on webhooks so delivery-status callbacks can't be spoofed, idempotency keys on order-creation
+      so a retried request can't double-book a driver, and versioned, documented endpoints (OpenAPI) so a
+      partner integration doesn't break silently on a backend change. None of this exists yet, and today's
+      CORS policy (<code>allow_origins=["*"]</code> with credentials allowed) is the opposite of a
+      partner-safe boundary. It needs fixing before any partner API ships, not after.</p>
+    </details>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>3. GPS Dashboard: fleet telematics</h2>
+    <div class="pill-row">
+      <span class="badge status-rethink">Built, needs rethinking</span>
+      <span class="badge muted">Drivra-Mobility/gps</span>
+    </div>
+    <p>A live map, idle/parked-state detection via geofencing, and a genuinely useful misuse-detection
+    feature that cross-references GPS movement against Yango ride records to flag drivers going off-app.
+    No backend of its own: it's a static, client-side app that reads and writes straight into Upahar's
+    Supabase tables using a public anon key, protected only by row-level security policies. Data arrives
+    via an external Lambda ETL (<code>trakzee-supabase-etl</code>) polling the fleet roughly once a
+    minute, confirmed working and out of scope for change here (see <a href="architecture.html">Architecture</a>
+    for why this piece specifically isn't being touched).</p>
+    <p>This is also the most directly reusable asset for the rent-to-own product: once a motorcycle is
+    financed, its GPS trail is exactly the telematics signal an East African competitor (Moove, M-KOPA)
+    would build fresh. Drivra already has it running, for a different purpose, on a different product.
+    See <a href="financing.html#scoring">credit scoring</a>.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>4. Rent-to-Own Financing: new</h2>
+    <div class="pill-row">
+      <span class="badge status-missing">Not built</span>
+      <span class="badge muted">proposed: standalone service</span>
+    </div>
+    <p>Let a driver finance their motorcycle through Drivra instead of a bank or the direct local
+    competitor (RYD Nepal). The differentiator: it's the only rent-to-own offer that can sit inside an
+    app the driver already uses daily, where their real earnings and tenure history, not a bank
+    statement, can translate into faster approval and better terms. Full design:
+    <a href="financing.html">financing.html</a>.</p>
+    <div class="row">
+      <div class="col sm-4">
+        <div class="card status-missing"><div class="card-body">
+          <h4 class="card-title">Discovery to application</h4>
+          <p class="small">Eligibility pre-check against existing Upahar tenure/performance data, before
+          any paperwork.</p>
+        </div></div>
+      </div>
+      <div class="col sm-4">
+        <div class="card status-missing"><div class="card-body">
+          <h4 class="card-title">KYC to underwriting</h4>
+          <p class="small">Citizenship + NID + license + selfie; rules-based scorecard from internal
+          behavioral data.</p>
+        </div></div>
+      </div>
+      <div class="col sm-4">
+        <div class="card status-missing"><div class="card-body">
+          <h4 class="card-title">Servicing to ownership</h4>
+          <p class="small">Installments, an always-visible ownership-progress tracker, completion or
+          default handling.</p>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap-wide">
+    <h4 class="eyebrow">Portfolio strategy</h4>
     <h2>Why these four should act like one platform, not four side projects</h2>
     <div class="table-wrap">
       <table>
         <tr><th>Signal</th><th>Where it lives today</th><th>What it could power</th></tr>
         <tr><td>Ride tenure, earnings consistency, streaks</td><td>Upahar (Supabase)</td><td>Rent-to-own credit scoring, already used in the v1 design</td></tr>
-        <tr><td>Delivery tenure, earnings, reliability</td><td>Express (own Postgres)</td><td>A second income-and-reliability signal for drivers who do both — currently invisible to any scoring model, since the databases don't talk</td></tr>
-        <tr><td>Vehicle GPS trail</td><td>GPS Dashboard (Upahar's Supabase, via Lambda ETL)</td><td>Asset monitoring for financed vehicles in a later financing phase — the infrastructure already exists</td></tr>
-        <tr><td>Repayment history</td><td>Would be new, in the financing service</td><td>The proprietary dataset every thin-file lender researched (Tugende, Watu) eventually builds toward — Drivra would be building it from day one across three products instead of one</td></tr>
+        <tr><td>Delivery tenure, earnings, reliability</td><td>Express (own Postgres)</td><td>A second income/reliability signal for drivers who do both. Currently invisible to any scoring model since the databases don't talk</td></tr>
+        <tr><td>Vehicle GPS trail</td><td>GPS Dashboard (Upahar's Supabase, via Lambda ETL)</td><td>Asset monitoring for financed vehicles in a later financing phase. The infrastructure already exists</td></tr>
+        <tr><td>Repayment history</td><td>Would be new, in the financing service</td><td>The proprietary dataset every thin-file lender researched (Tugende, Watu) eventually builds toward. Drivra would build it from day one across three products instead of one</td></tr>
       </table>
     </div>
-    <p style="margin-top:var(--s5)">This is the product case for the consolidation work in <a href="architecture.html">Architecture</a>: a driver's full picture is currently split across a Supabase project and a separate self-hosted Postgres with no data pipeline between them. Fixing that isn't just hygiene — it's the difference between a credit score built on a third of a driver's actual activity and one built on all of it.</p>
+    <p style="margin-top:1.25rem">This is the product case for the consolidation work in
+    <a href="architecture.html">Architecture</a>: a driver's full picture is currently split across a
+    Supabase project and a separate self-hosted Postgres with no data pipeline between them. Fixing that
+    isn't just hygiene, it's the difference between a credit score built on a third of a driver's actual
+    activity and one built on all of it.</p>
   </div>
 </section>
 
 <footer>
-  <div class="shell">Drivra Tech — internal strategy document. Not for external distribution.</div>
+  <div class="wrap">Drivra Tech: internal strategy document. Not for external distribution.</div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    look: 'handDrawn',
+    theme: 'neutral',
+    themeVariables: {
+      fontFamily: 'Neucha, sans-serif',
+      primaryColor: '#cfe8dc',
+      primaryTextColor: '#06442e',
+      primaryBorderColor: '#0b6948',
+      lineColor: '#2e4a62'
+    },
+    flowchart: { htmlLabels: true, curve: 'basis' }
+  });
+</script>
 </body>
 </html>

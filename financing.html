@@ -3,31 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<title>Rent-to-Own Financing — Drivra Tech</title>
+<title>Rent-to-Own Financing: Drivra Tech</title>
 <link rel="icon" href="static/img/drivra-mark.png">
-<link rel="stylesheet" href="static/css/theme.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/papercss@1.9.2/dist/paper.min.css">
+<link rel="stylesheet" href="static/css/drivra-paper.css">
 </head>
 <body>
 
-<div class="topbar">
+<nav class="topbar">
   <a href="index.html" class="wordmark"><img src="static/img/drivra-mark.png" alt="">Drivra <span class="tag">Tech</span></a>
-  <nav class="topnav">
+  <div class="topnav">
     <a href="index.html">Overview</a>
     <a href="product.html">Product</a>
     <a href="architecture.html">Architecture</a>
     <a href="financing.html" class="active">Rent-to-Own</a>
     <a href="roadmap.html">Roadmap &amp; Cost</a>
-  </nav>
-</div>
+  </div>
+</nav>
 
-<section class="hero" style="padding-bottom: var(--s6)">
-  <div class="shell">
-    <div class="eyebrow">Rent-to-Own Driver Financing</div>
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Rent-to-Own Driver Financing <span class="badge status-missing" style="margin-left:0.5rem">Not built</span></div>
     <h1>Full product &amp; system design</h1>
-    <p class="lede">Let a driver finance their motorcycle through Drivra. This page is the complete design:
-    who else is already doing this and how, what Nepal's regulator actually requires, the full system
-    architecture, the driver-facing journey, and how credit gets decided with no external bureau in year one.</p>
+    <p class="lede">Let a driver finance their motorcycle through Drivra. Who else is already doing this
+    and how, what Nepal's regulator actually requires, the full system architecture, the driver-facing
+    journey, and how credit gets decided with no external bureau in year one.</p>
     <div class="sectionnav">
       <a href="#competitive">Competitive landscape</a>
       <a href="#regulatory">Nepal regulation</a>
@@ -40,326 +40,353 @@
 </section>
 
 <section id="competitive" style="padding-top:0">
-  <div class="shell-wide">
-    <h4>Competitive landscape</h4>
+  <div class="wrap-wide">
+    <h4 class="eyebrow">Competitive landscape</h4>
     <h2>A local competitor is already running this exact model</h2>
-    <p>RYD Nepal (rydnepal.com) rents Hero Super Splendor 125cc motorcycles to Kathmandu gig drivers today.
-    Founded 2025, self-funded, 120+ bikes, claims 500+ active riders, single-SKU fleet.</p>
+    <p>RYD Nepal (rydnepal.com) rents Hero Super Splendor 125cc motorcycles to Kathmandu gig drivers
+    today. Founded 2025, self-funded, 120+ bikes, claims 500+ active riders, single-SKU fleet. Only one
+    of their three plans actually leads to ownership (Pro Monthly, Rs 7,000/week, after 1.5 years), which
+    is worth noting since most of their marketing describes "own the bike in 18 months" as if it applies
+    broadly. KYC is driving license + citizenship copy only, under 30 minutes, zero down payment, no app
+    (web form + WhatsApp + in-person).</p>
 
-    <div class="table-wrap">
-      <table>
-        <tr><th>Plan</th><th>Price</th><th>Leads to ownership?</th></tr>
-        <tr><td>Weekly</td><td>Rs 5,600/week</td><td>No</td></tr>
-        <tr><td><strong>Pro Monthly ("Best Value")</strong></td><td>Rs 7,000/week</td><td><strong>Yes — after 1.5 years</strong></td></tr>
-        <tr><td>Prepayment</td><td>Rs 21,000/month (Rs 700/day — cheapest per-day rate)</td><td>No</td></tr>
-      </table>
-    </div>
-    <p style="margin-top:var(--s4)"><strong>Only one of RYD's three plans actually leads to ownership</strong> —
-    worth noting since most of their marketing describes "own the bike in 18 months" as if it applies broadly.
-    KYC is driving license + citizenship copy only, processed in under 30 minutes, in person or via WhatsApp —
-    no income proof, no credit check, no guarantor, no app (web form + WhatsApp + in-person at their Kapan
-    workshop). Zero down payment. Free service every 1,500km, 24/7 breakdown line, a replacement bike within
-    30–40 minutes if repair runs long, and a welcome "Sagoon kit" (helmet, phone mount, raincoat) plus a
-    Rs 1,500 fuel coupon on pickup. Missed-payment mechanics are <strong>not disclosed anywhere public</strong> —
-    marketed only as "no penalty fees, no credit-bureau drama." Their sharpest marketing copy targets other
-    <em>unnamed</em> rental competitors ("bikes deteriorate by month two," "you fix it, I'll think about it"),
-    not banks or predatory lenders. Trust signal: only three self-hosted testimonials, zero independent reviews
-    found anywhere (no Trustpilot, Google reviews, Reddit) — their credibility is entirely self-curated, which
-    is itself an opening.</p>
-
-    <h3 style="margin-top:var(--s6)">Global comparables</h3>
-    <div class="table-wrap">
-      <table>
-        <tr><th>Company</th><th>Market</th><th>Model</th><th>Notable mechanic</th></tr>
-        <tr><td><strong>M-KOPA</strong></td><td>Kenya, Uganda, Nigeria, Ghana, S. Africa</td><td>PAYG motorbike financing, KES 10–25k deposit + daily installments</td><td>Missed payment → remote lock via embedded IoT, term just extends, explicitly <strong>"no penalty," no debt spiral</strong>; can return the bike and walk away clean with deposit refunded. Strongest trust-building policy found in this research.</td></tr>
-        <tr><td><strong>Tugende</strong></td><td>Uganda, Kenya</td><td>Lease-to-own boda financing, ~$120 down, ~82 weekly payments</td><td>Requires a family guarantor + 3-week training before financing — a soft underwriting layer, not just a data score. Builds its own proprietary repayment dataset via its own payments platform ("PayWay") rather than external bureau data.</td></tr>
-        <tr><td><strong>Watu Credit</strong></td><td>East Africa, +Mexico/Brazil</td><td>Lease-to-own, &lt;2hr approval, "no credit history needed"</td><td>Requires 6+ months of active mobile-money (M-Pesa) history as the alt-credit proxy. GPS remote-immobilize on default, 7-day redemption window. Real reputational problem: Facebook impersonation scams using their brand, consumer-advocacy complaints about collection conduct.</td></tr>
-        <tr><td><strong>Moove</strong></td><td>Africa, UK, India (Uber's financing partner)</td><td>"Ride-to-own," up to 95% financed, 24–48mo tenure</td><td>Auto-deducts weekly repayment directly from Uber trip earnings via a companion app. Collects telematics/driver-behavior data for risk modeling. Nigeria driver protests over insufficient take-home pay and aggressive in-person debt collection when marketed flexibility didn't match practice — a clear cautionary case.</td></tr>
-        <tr><td><strong>Grab (GrabScheme)</strong></td><td>Indonesia (motorcycles)</td><td>Platform = distribution/data, bank-backed multifinance company = balance sheet</td><td>Grab did not self-finance — partnered with PT Central Santosa Finance (a Bank Central Asia subsidiary) to originate loans. The clearest precedent for a "tech layer + licensed partner" structure. Separately, Nikkei Asia reported Grab charging &gt;230% effective APR on short-term in-app loans to Philippine drivers — a reputational/regulatory caution on pricing transparency.</td></tr>
-        <tr><td><strong>Uber Vehicle Solutions</strong></td><td>USA</td><td>Curated marketplace of 3rd-party rental/lease partners (Hertz, Avis, Getaround)</td><td>"Aggregator, not lender" pattern — Uber never originates financing itself. Contrast case to the direct-balance-sheet models above.</td></tr>
-        <tr><td><strong>Ola Fleet</strong></td><td>India</td><td>Lease-to-own, evolved over several program iterations</td><td>Cautionary case: active legal disputes with drivers over alleged vehicle confiscation and unfulfilled ownership promises from earlier lease terms. A direct warning on keeping ownership-transfer terms unambiguous and documented.</td></tr>
-        <tr><td><strong>Bangladesh banks (via Pathao)</strong></td><td>Bangladesh</td><td>BRAC Bank, Eastern Bank, City Bank, Prime Bank underwrite motorcycle loans using ride-share earnings as qualifying income</td><td>Pathao itself runs no captive financing arm — banks just accept 6 months of platform-earnings bank statements as income proof. The "lighter-touch, no captive lender" alternative pattern.</td></tr>
-        <tr><td><strong>Bajaj Finance / Hero FinCorp</strong></td><td>India</td><td>General retail two-wheeler finance, up to 100%/95% financed</td><td>Neither has a purpose-built gig-driver underwriting product — general bureau-based retail finance still dominates in India, unlike thin-file East Africa. Signals a possible market gap rather than a proven approach.</td></tr>
-      </table>
+    <div class="alert alert-primary">
+      <strong>Category-wide finding:</strong> none of these companies, RYD Nepal included, have any real,
+      independently documented UX: no screenshots, no coverage on UX pattern libraries. A well-designed,
+      actually-screenshotted, transparent driver experience would be a genuine differentiator on its own,
+      separate from pricing or terms.
     </div>
 
-    <div class="callout callout-brand">
-      <h4>Category-wide finding</h4>
-      <p>None of these companies — RYD Nepal included — have any real, independently documented UX: no
-      screenshots, no coverage on UX pattern libraries (Mobbin, Page Flows, Dribbble), for any of them. A
-      well-designed, actually-screenshotted, transparent driver experience would be a genuine differentiator
-      in this category on its own, separate from pricing or terms.</p>
-    </div>
+    <details class="collapsible-plain">
+      <summary>Full competitor table: RYD Nepal, global comparables, Nepal digital-lending UX</summary>
+      <div style="margin-top:1rem">
+        <h3>RYD Nepal's plans</h3>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Plan</th><th>Price</th><th>Leads to ownership?</th></tr>
+            <tr><td>Weekly</td><td>Rs 5,600/week</td><td>No</td></tr>
+            <tr><td>Pro Monthly ("Best Value")</td><td>Rs 7,000/week</td><td>Yes, after 1.5 years</td></tr>
+            <tr><td>Prepayment</td><td>Rs 21,000/month (Rs 700/day, cheapest per-day rate)</td><td>No</td></tr>
+          </table>
+        </div>
+        <p style="margin-top:0.75rem">Free service every 1,500km, 24/7 breakdown line, a replacement bike
+        within 30 to 40 minutes if repair runs long, and a welcome "Sagoon kit" (helmet, phone mount,
+        raincoat) plus a Rs 1,500 fuel coupon on pickup. Missed-payment mechanics are not disclosed
+        anywhere public, marketed only as "no penalty fees, no credit-bureau drama." Trust signal: only
+        three self-hosted testimonials, zero independent reviews found anywhere (no Trustpilot, Google
+        reviews, Reddit), so their credibility is entirely self-curated, itself an opening.</p>
 
-    <h3 style="margin-top:var(--s6)">Nepal digital-lending UX (the closest local pattern for an embedded-finance flow)</h3>
-    <div class="table-wrap">
-      <table>
-        <tr><th>Product</th><th>Shape</th><th>Terms / detail</th></tr>
-        <tr><td><strong>eSewa easyloan</strong></td><td>In-wallet lending for merchants/agents, wallet-transaction-history-based eligibility (no bureau score), 6+ months active usage required</td><td>Rs 15,000–200,000, 17–18% annual interest, 2% penal interest, 0.75–1.25% processing fee</td></tr>
-        <tr><td><strong>Khalti + NIC Asia "Super Chamatkarik Loan"</strong></td><td>Khalti is a pure front-end/PSP — application happens in-app, but an NIC Asia rep manually processes within 48 hours off-app</td><td>Hybrid, not fully self-serve digital lending</td></tr>
-        <tr><td><strong>Foneloan</strong> (F1Soft/eSewa's parent group)</td><td>White-labeled digital lending layer embedded across 11+ Nepali banks' mobile-banking apps (Nabil, Kumari, NIC Asia, Agricultural Development Bank, etc.)</td><td>Payday loans, EMI loans, and a BNPL product ("HamroBNPL") — the closest Nepali analogue to embedding a financing flow inside an app people already trust and use daily, rather than a separate destination like RYD Nepal's web/WhatsApp flow</td></tr>
-      </table>
-    </div>
-    <p style="margin-top:var(--s4)">The common thread across all three: <strong>wallet/account transaction
-    history substitutes for a credit bureau score</strong>, and underwriting is handed off to a licensed
-    bank/PSP partner behind the scenes — precisely the shape this product should take.</p>
+        <h3 style="margin-top:1.5rem">Global comparables</h3>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Company</th><th>Market</th><th>Model</th><th>Notable mechanic</th></tr>
+            <tr><td>M-KOPA</td><td>Kenya, Uganda, Nigeria, Ghana, S. Africa</td><td>PAYG motorbike financing, KES 10 to 25k deposit + daily installments</td><td>Missed payment extends the term with no penalty; can return the bike and walk away clean with deposit refunded. Strongest trust-building policy found in this research.</td></tr>
+            <tr><td>Tugende</td><td>Uganda, Kenya</td><td>Lease-to-own boda financing, about $120 down, about 82 weekly payments</td><td>Requires a family guarantor plus 3-week training before financing, a soft underwriting layer. Builds its own proprietary repayment dataset via its own payments platform ("PayWay") rather than external bureau data.</td></tr>
+            <tr><td>Watu Credit</td><td>East Africa, plus Mexico/Brazil</td><td>Lease-to-own, under 2hr approval, "no credit history needed"</td><td>Requires 6+ months of active mobile-money history as the alt-credit proxy. GPS remote-immobilize on default, 7-day redemption window. Real reputational problems: Facebook impersonation scams, consumer-advocacy complaints about collection conduct.</td></tr>
+            <tr><td>Moove</td><td>Africa, UK, India (Uber's financing partner)</td><td>"Ride-to-own," up to 95% financed, 24 to 48mo tenure</td><td>Auto-deducts weekly repayment directly from Uber trip earnings. Nigeria driver protests over insufficient take-home pay and aggressive in-person debt collection, a clear cautionary case.</td></tr>
+            <tr><td>Grab (GrabScheme)</td><td>Indonesia (motorcycles)</td><td>Platform = distribution/data, bank-backed multifinance company = balance sheet</td><td>Grab partnered with PT Central Santosa Finance (a Bank Central Asia subsidiary) rather than self-financing, the clearest precedent for a tech-layer-plus-licensed-partner structure. Separately, Nikkei Asia reported Grab charging over 230% effective APR on short-term in-app loans to Philippine drivers.</td></tr>
+            <tr><td>Uber Vehicle Solutions</td><td>USA</td><td>Curated marketplace of third-party rental/lease partners</td><td>"Aggregator, not lender" pattern; Uber never originates financing itself.</td></tr>
+            <tr><td>Ola Fleet</td><td>India</td><td>Lease-to-own, evolved over several program iterations</td><td>Active legal disputes with drivers over alleged vehicle confiscation and unfulfilled ownership promises, a direct warning on keeping ownership-transfer terms unambiguous.</td></tr>
+            <tr><td>Bangladesh banks (via Pathao)</td><td>Bangladesh</td><td>Banks underwrite motorcycle loans using ride-share earnings as qualifying income</td><td>Pathao itself runs no captive financing arm; banks accept 6 months of platform-earnings statements as income proof. The lighter-touch, no-captive-lender alternative.</td></tr>
+            <tr><td>Bajaj Finance / Hero FinCorp</td><td>India</td><td>General retail two-wheeler finance, up to 95 to 100% financed</td><td>No purpose-built gig-driver underwriting product; general bureau-based retail finance still dominates in India. A possible market gap rather than a proven approach.</td></tr>
+          </table>
+        </div>
 
-    <h3 style="margin-top:var(--s6)">Recommended positioning</h3>
+        <h3 style="margin-top:1.5rem">Nepal digital-lending UX</h3>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Product</th><th>Shape</th><th>Terms</th></tr>
+            <tr><td>eSewa easyloan</td><td>In-wallet lending, wallet-history-based eligibility, 6+ months active usage required</td><td>Rs 15,000 to 200,000, 17 to 18% annual interest, 2% penal interest</td></tr>
+            <tr><td>Khalti + NIC Asia "Super Chamatkarik Loan"</td><td>Khalti is a pure front-end/PSP; an NIC Asia rep manually processes within 48 hours off-app</td><td>Hybrid, not fully self-serve</td></tr>
+            <tr><td>Foneloan (F1Soft/eSewa's parent group)</td><td>White-labeled digital lending embedded across 11+ Nepali banks' apps</td><td>Payday, EMI, and a BNPL product ("HamroBNPL"), the closest Nepali analogue to embedding financing inside an app people already use daily</td></tr>
+          </table>
+        </div>
+        <p style="margin-top:0.75rem">The common thread across all three: wallet/account transaction
+        history substitutes for a credit bureau score, and underwriting is handed off to a licensed
+        bank/PSP partner behind the scenes, precisely the shape this product should take.</p>
+      </div>
+    </details>
+
+    <h3 style="margin-top:2rem">Recommended positioning</h3>
     <ul class="tight">
-      <li><strong>Lead differentiator:</strong> the only rent-to-own offer built <em>inside</em> an app the
-      driver already uses daily for rewards/earnings tracking — real usage history translates directly into
-      faster approval and better terms for loyal drivers, which neither RYD Nepal (web/WhatsApp-only) nor a
-      bank (needs a traditional file) can offer.</li>
-      <li><strong>A compliant no-debt-spiral policy, not just messaging.</strong> M-KOPA's explicit "missed
-      payment extends the term, no penalty" policy is the strongest trust lever found in this research — and
-      it happens to already be achievable as a <em>compliant</em> policy in Nepal, not just an aspirational
-      one: NRB's hire-purchase rules cap penalty interest at 2pp/year and explicitly ban penalty-on-penalty
-      compounding (see Regulation, below). Say this explicitly in marketing, backed by the actual contract terms.</li>
-      <li><strong>A visible ownership-progress tracker</strong> — percentage-owned, remaining installments,
+      <li><strong>Lead differentiator:</strong> the only rent-to-own offer built inside an app the driver
+      already uses daily for rewards/earnings tracking.</li>
+      <li><strong>A compliant no-debt-spiral policy, not just messaging:</strong> M-KOPA's "missed
+      payment extends the term, no penalty" policy is achievable as a compliant policy in Nepal too. NRB's
+      hire-purchase rules cap penalty interest at 2pp/year and ban penalty-on-penalty compounding.</li>
+      <li><strong>A visible ownership-progress tracker:</strong> percentage-owned, remaining installments,
       clear payoff date. No competitor researched currently shows this.</li>
-      <li><strong>Tier-linked terms.</strong> Better down payment or priority allocation for higher-tier Upahar
-      drivers — a synergy this product structurally has and RYD Nepal cannot replicate.</li>
+      <li><strong>Tier-linked terms:</strong> better down payment or priority allocation for higher-tier
+      Upahar drivers, a synergy RYD Nepal cannot replicate.</li>
     </ul>
   </div>
 </section>
 
 <section id="regulatory">
-  <div class="shell-wide">
-    <h4>Nepal regulation</h4>
+  <div class="wrap-wide">
+    <h4 class="eyebrow">Nepal regulation</h4>
     <h2>The single biggest thing shaping this design</h2>
-    <p>Nepal Rastra Bank (NRB) regulation, not engineering choice, determines what's actually buildable:</p>
-    <ul class="tight">
-      <li>Under BAFIA, <strong>only a licensed BFI (Class A/B/C/D) may originate/hold consumer loans</strong> —
-      a pure tech company cannot lend directly. Verified against the statute text itself, not just commentary:
-      <strong>BAFIA 2073, Chapter 6, Section 31</strong> — "No one, except the bank or financial institution
-      having obtained a license pursuant to Section 34, shall carry on banking or financial transactions
-      according to this Act."</li>
-      <li>Vehicle financing specifically sits under a <strong>Hire Purchase Company</strong> license, governed
-      by "Policy and Procedural Provisions for Granting Approval to Companies Providing Hire Purchase Loans,
-      2070," most recently updated by a <strong>Sixth Amendment (~Aug 2026, only weeks before this research)</strong>:
-      <strong>NPR 300M</strong> minimum paid-up capital (converging across multiple sources, high confidence),
-      a <strong>60% LTV cap (≥40% down payment)</strong> that the Sixth Amendment changed from an
-      independently-fixed hire-purchase number to one <em>cross-referenced against the general BFI vehicle-loan
-      LTV directive</em> — so it can move when that general directive moves, not only when hire-purchase rules
-      change directly. Also new in the Sixth Amendment: a cost-of-funds-based interest mechanism (replacing a
-      flat spread cap), 10-fiscal-year license renewal, a higher PAN-requirement threshold, and a mandatory
-      multi-brand financing requirement. <strong>One documented exception worth knowing:</strong> NRB approved
-      LTV up to 80% for businesses replacing vehicles damaged in the 2026 Gen-Z protests — narrow and
-      situational, not a general relief valve.</li>
-      <li><strong>CIB Nepal</strong> (the credit bureau) is only accessible to NRB-registered BFIs.</li>
-      <li><strong>Repossession is two separate legal instruments working together, not one</strong> — worth
-      getting right since it's easy to conflate. <strong>BAFIA §57</strong> is the substantive power: a
-      licensed BFI can auction mortgaged/pledged collateral without a court order on default. The commonly-cited
-      <strong>"35-day notice"</strong>, though, is <em>not</em> written into §57 itself — it comes from a
-      separate law, <strong>the Act on Recovery of Debts of Banks and Financial Institutions, 2058 (2002)</strong>,
-      read with Rule 4 of its 2059 Regulations. In practice they're used together (real published bank
-      repossession notices consistently cite the 35-day figure), but they're legally distinct instruments, and
-      the Debt Recovery Act explicitly doesn't apply below NPR 500,000 principal.</li>
-      <li><strong>AML/KYC obligations apply regardless of structure:</strong> e-KYC with biometric verification
-      under the Asset (Money) Laundering Prevention Act 2008; suspicious-transaction reports filed via goAML
-      within <strong>3 days</strong>; records retained a minimum of <strong>5 years</strong>.</li>
-    </ul>
+    <p>Nepal Rastra Bank (NRB) regulation, not engineering choice, determines what's actually buildable.
+    Under BAFIA, only a licensed BFI may originate or hold consumer loans, a pure tech company cannot lend
+    directly (BAFIA 2073, Chapter 6, Section 31). Vehicle financing sits under a Hire Purchase Company
+    license: NPR 300M minimum paid-up capital, a 60% LTV cap (at least 40% down payment), per the Sixth
+    Amendment (roughly August 2026, only weeks before this research).</p>
 
-    <div class="callout callout-critical">
-      <h4>The single most load-bearing open legal question in this whole document</h4>
-      <p>Does a licensed <strong>hire-purchase company</strong> specifically — approved under a narrower
-      mechanism, Nepal Rastra Bank Act 2058 §76 — actually get to invoke BAFIA §57's self-help repossession
-      power? Sources conflict: some describe hire-purchase companies as licensed "Class C Finance Companies"
-      under BAFIA itself (which would carry §57 rights cleanly); others describe the NRB Act §76 approval as a
-      distinct status. This determines whether Path A's repossession story (fast, no-court-order, under BAFIA)
-      actually holds for Drivra's specific corporate form, or whether it falls back to the Secured Transactions
-      Act 2063's separate (non-BFI-specific) self-help remedy, or ordinary civil process. <strong>This cannot
-      be resolved by more research — it needs a Nepali banking/finance lawyer's direct read of Drivra's actual
-      proposed corporate structure</strong> before the business treats fast repossession as a given.</p>
+    <div class="alert alert-danger">
+      <strong>The single most load-bearing open legal question here:</strong> does a licensed
+      hire-purchase company specifically get to invoke BAFIA §57's self-help repossession power? Sources
+      conflict. This cannot be resolved by more research; it needs a Nepali banking/finance lawyer's
+      direct read of Drivra's actual proposed corporate structure before the business treats fast
+      repossession as a given.
     </div>
 
-    <div class="table-wrap" style="margin-top:var(--s5)">
-      <table>
-        <tr><th>Path</th><th>Shape</th><th>Trade-off</th></tr>
-        <tr><td><strong>A. Partner with a licensed lender</strong></td><td>Approach an existing Class C hire-purchase company (e.g. Hulas Finserv, Nepal's largest two-wheeler financier) — Drivra is the distribution + underwriting-data + servicing tech layer, the partner is lender of record</td><td>Mirrors Grab's GrabScheme in Indonesia. Avoids the NPR 300M capital bar; gets §57 repossession rights and CIB access through the partner. Needs a real partnership deal; ≥40% down payment required by regulation.</td></tr>
-        <tr><td><strong>B. Lease-with-purchase-option</strong></td><td>RYD Nepal's structure</td><td>Lower capital bar, can offer low/zero down. Legally less tested; likely loses §57 fast-repossession; the lease/hire-purchase line isn't bright and could draw regulatory attention as the space grows.</td></tr>
-        <tr><td><strong>C. Become a licensed Hire Purchase Company</strong></td><td>Full control</td><td>NPR 300M capital + full NRB compliance burden — a multi-quarter/legal undertaking, not a v1 move.</td></tr>
-      </table>
+    <div class="diagram">
+      <div class="mermaid">
+flowchart TD
+  Q{"How should Drivra<br/>originate the loan?"}
+  A["Path A<br/>Partner with a licensed lender<br/>e.g. Hulas Finserv"]
+  B["Path B<br/>Lease-with-purchase-option<br/>RYD Nepal's structure"]
+  C["Path C<br/>Become a licensed<br/>Hire Purchase Company"]
+  Q --> A
+  Q --> B
+  Q --> C
+  A --> AR["Avoids NPR 300M capital bar.<br/>Gets §57 rights + CIB access<br/>through the partner. Needs a<br/>real partnership deal."]
+  B --> BR["Lower capital bar, can offer<br/>low/zero down. Legally less<br/>tested, likely loses §57<br/>fast repossession."]
+  C --> CR["Full control. NPR 300M +<br/>full NRB compliance burden.<br/>Multi-quarter undertaking,<br/>not a v1 move."]
+  classDef rec fill:#d7ecdf,stroke:#1a7a42,color:#14532d,stroke-width:2px;
+  classDef alt fill:#e5e7eb,stroke:#6b7280,color:#374151,stroke-width:2px;
+  class A,AR rec;
+  class B,BR,C,CR alt;
+      </div>
     </div>
-    <div class="callout callout-brand">
-      <h4>Recommendation for design purposes: architect for Path A</h4>
-      <p>Closest fit to the "standalone service, internal credit signal, independent-of-Yango collection"
-      decisions already made, and the cleanest regulatory footing without a NPR 300M capital commitment.
-      <strong>This is a legal decision for Nepali financial-regulatory counsel, not resolved here</strong> —
-      the data model treats "lender of record" as a field, so it doesn't block starting the
-      KYC/underwriting/servicing build, but must be resolved before signing real contracts with drivers.</p>
-    </div>
+    <p class="diagram-caption">Recommended for design purposes: Path A. Closest fit to the
+    standalone-service decisions already made, cleanest regulatory footing without a NPR 300M capital
+    commitment. This is a legal decision for Nepali financial-regulatory counsel, not resolved here.</p>
+
+    <details class="collapsible-plain">
+      <summary>Full regulatory detail: repossession, AML/KYC, CIB Nepal</summary>
+      <ul class="tight" style="margin-top:1rem">
+        <li><strong>CIB Nepal</strong> (the credit bureau) is only accessible to NRB-registered BFIs.</li>
+        <li><strong>Repossession is two separate legal instruments working together, not one.</strong>
+        BAFIA §57 is the substantive power: a licensed BFI can auction mortgaged/pledged collateral
+        without a court order on default. The commonly-cited "35-day notice," though, is not written into
+        §57 itself; it comes from a separate law, the Act on Recovery of Debts of Banks and Financial
+        Institutions, 2058 (2002), read with Rule 4 of its 2059 Regulations. In practice they're used
+        together (real published bank repossession notices consistently cite the 35-day figure), but
+        they're legally distinct instruments, and the Debt Recovery Act explicitly doesn't apply below NPR
+        500,000 principal.</li>
+        <li><strong>AML/KYC obligations apply regardless of structure:</strong> e-KYC with biometric
+        verification under the Asset (Money) Laundering Prevention Act 2008; suspicious-transaction
+        reports filed via goAML within 3 days; records retained a minimum of 5 years.</li>
+        <li><strong>One documented exception worth knowing:</strong> NRB approved LTV up to 80% for
+        businesses replacing vehicles damaged in the 2026 Gen-Z protests. Narrow and situational, not a
+        general relief valve.</li>
+        <li>Also new in the Sixth Amendment: a cost-of-funds-based interest mechanism (replacing a flat
+        spread cap), 10-fiscal-year license renewal, a higher PAN-requirement threshold, and a mandatory
+        multi-brand financing requirement.</li>
+      </ul>
+    </details>
   </div>
 </section>
 
 <section id="journey">
-  <div class="shell">
-    <h4>Driver journey</h4>
+  <div class="wrap-wide">
+    <h4 class="eyebrow">Driver journey</h4>
     <h2>End to end</h2>
-    <div class="journey">
-      <div class="journey-step" data-n="1"><h4>Discovery</h4><p>An "Own Your Bike" entry point inside the existing Upahar app, surfaced by tenure/tier; a lightweight eligibility pre-check against existing performance data before any paperwork.</p></div>
-      <div class="journey-step" data-n="2"><h4>Application</h4><p>Desired plan/vehicle, down payment amount, basic details.</p></div>
-      <div class="journey-step" data-n="3"><h4>KYC</h4><p>Citizenship certificate + National ID + driving license photo capture, selfie for liveness/face-match, optional guarantor capture for thin-file applicants.</p></div>
-      <div class="journey-step" data-n="4"><h4>Underwriting decision</h4><p>Rules-based scorecard → approve / decline / refer-to-manual, always admin-overridable with an audit-logged reason.</p></div>
-      <div class="journey-step" data-n="5"><h4>Contract &amp; terms</h4><p>Vehicle allocation, down payment, installment schedule, agreement type per the resolved legal path; e-signature/acceptance captured.</p></div>
-      <div class="journey-step" data-n="6"><h4>Disbursement/handover</h4><p>Lien recorded (bluebook annotation + STRO filing where required), physical handover logged, first schedule activated.</p></div>
-      <div class="journey-step" data-n="7"><h4>Servicing</h4><p>Recurring installments, reminders, payment intake, ledger posting, an always-visible ownership-progress tracker.</p></div>
-      <div class="journey-step" data-n="8"><h4>Ongoing monitoring</h4><p>Periodic re-pull of Upahar (and, later, Express) performance data catches early drift before a payment is even missed.</p></div>
-      <div class="journey-step" data-n="9"><h4>Completion or default</h4><p>Final installment → ownership transfer, lien released. Or: delinquency → dunning → default/repossession per the resolved legal path.</p></div>
+    <div class="diagram">
+      <div class="mermaid">
+flowchart LR
+  A["Discovery<br/>Own Your Bike entry<br/>point inside Upahar"] --> B["Application<br/>plan, vehicle,<br/>down payment"]
+  B --> C["KYC<br/>citizenship + NID +<br/>license + selfie"]
+  C --> D["Underwriting<br/>rules-based scorecard,<br/>admin-overridable"]
+  D --> E["Contract &amp; terms<br/>e-signature"]
+  E --> F["Disbursement<br/>lien recorded,<br/>handover logged"]
+  F --> G["Servicing<br/>installments,<br/>ownership tracker"]
+  G --> H["Monitoring<br/>periodic re-pull of<br/>performance data"]
+  H --> I["Completion or default<br/>ownership transfer,<br/>or repossession"]
+  classDef missing fill:#e5e7eb,stroke:#6b7280,color:#374151,stroke-width:2px;
+  class A,B,C,D,E,F,G,H,I missing;
+      </div>
     </div>
+    <p class="diagram-caption">Every step is new, part of the Financing build. Gray throughout: nothing
+    here is built yet.</p>
   </div>
 </section>
 
 <section id="architecture">
-  <div class="shell-wide">
-    <h4>System architecture</h4>
+  <div class="wrap-wide">
+    <h4 class="eyebrow">System architecture</h4>
     <h2>A standalone service, plugged into the identity layer</h2>
-    <p><strong>Standalone service:</strong> own repo, own Postgres database, reusing Upahar's proven stack —
-    FastAPI + SQLAlchemy 2.0 + Alembic + Jinja2/HTMX admin console — but its own deployment and security
-    perimeter, since it holds KYC documents and financial data. It reads driver identity and performance data
-    from the canonical identity layer described in <a href="architecture.html#vision">Architecture</a> — never
-    direct database access into Upahar or Express.</p>
+    <p><strong>Standalone service:</strong> own repo, own Postgres database, reusing Upahar's proven stack
+    (FastAPI + SQLAlchemy 2.0 + Alembic + Jinja2/HTMX admin), but its own deployment and security
+    perimeter, since it holds KYC documents and financial data. It reads driver identity and performance
+    data from the canonical identity layer described in <a href="architecture.html#vision">Architecture</a>,
+    never direct database access into Upahar or Express.</p>
 
-    <h3 style="margin-top:var(--s6)">Auth</h3>
-    <p>Reuse Upahar's proven shape, decoupled: driver auth = phone + SparrowSMS OTP, issuing a JWT scoped to a
-    distinct <code>financing_driver</code> audience — deliberately not SSO-trusting Upahar's session for v1,
-    to keep security boundaries independent (a "Continue with Upahar" bridge is a reasonable later enhancement).
-    Admin auth mirrors the bcrypt+JWT pattern, with more granular roles than Upahar's owner/staff split:
-    <strong>KYC reviewer, underwriter, collections/ops, owner/compliance.</strong></p>
-
-    <h3 style="margin-top:var(--s6)">Storage: Supabase Storage over raw AWS S3 for v1</h3>
-    <p>At this scale (a few thousand drivers × ~5 documents), storage/egress cost is trivial on either
-    (low single-digit dollars/month). The deciding factor is integration effort: Supabase Storage is wired
-    directly into Postgres Row-Level Security, so "only the assigned KYC reviewer or the document's owner can
-    read this file" is a SQL policy against the same schema already modeling drivers/loans/officers — versus
-    hand-rolling IAM/Cognito-equivalent logic for raw S3. Supabase Storage is itself S3-compatible under the
-    hood, so this isn't lock-in; raw S3 becomes worth revisiting mainly for KMS-based per-key audit trails if
-    a regulator later requires that level of detail. <strong>This must be its own Supabase project</strong> —
-    not the one Upahar and GPS Dashboard already share.</p>
-
-    <h3 style="margin-top:var(--s6)">eKYC: DIY AWS Textract + Rekognition for v1</h3>
-    <p>Per-driver verification cost is roughly <strong>$0.07</strong> (Textract <code>AnalyzeID</code> for the
-    2 ID documents + Rekognition liveness check + face-compare) versus <strong>$2–7 per verification</strong>
-    for global vendors like Jumio/Onfido. Two Nepal-aware vendors exist (Shufti Pro, FACEKI) but neither
-    publishes pricing — worth getting quotes, but DIY is roughly an order of magnitude cheaper and keeps v1
-    lean; the trade-off is owning fraud-detection tuning and liability in-house, acceptable for a
-    manually-reviewed v1 where a human still signs off on every KYC approval regardless.</p>
-
-    <h3 style="margin-top:var(--s6)">Data model</h3>
-    <div class="table-wrap">
-      <table>
-        <tr><th>Table</th><th>Purpose</th><th>Key fields</th></tr>
-        <tr><td><code>drivers</code></td><td>Identity, linked to the canonical identity layer via phone</td><td>phone, name, dob, address, kyc_status</td></tr>
-        <tr><td><code>kyc_documents</code></td><td>Uploaded documents</td><td>driver_id, doc_type (citizenship/NID/license/PAN/selfie), file_path, status, reviewed_by, reviewed_at</td></tr>
-        <tr><td><code>guarantors</code></td><td>Cold-start co-signers</td><td>driver_id, name, phone, id_document_path, relationship</td></tr>
-        <tr><td><code>vehicles</code></td><td>Asset registry — deliberately separate from Upahar's driver-vehicle columns, which are wholesale-overwritten by Yango sync and reflect only the driver's <em>current</em> Yango-assigned vehicle</td><td>chassis_number, engine_number, plate_number, brand_model, cost, bluebook_ref, lien_status, stro_reference</td></tr>
-        <tr><td><code>loan_products</code></td><td>Configurable plan terms</td><td>tenure_months, down_payment_pct, interest_rate, penalty_rate</td></tr>
-        <tr><td><code>applications</code></td><td>Origination workflow state</td><td>driver_id, product_id, vehicle_id, status, decision_reason, decided_by, decided_at</td></tr>
-        <tr><td><code>loan_accounts</code></td><td>The active agreement</td><td>application_id, driver_id, vehicle_id, principal, down_payment, tenure_months, status, <strong>lender_of_record</strong> (absorbs the legal-path decision without blocking the build)</td></tr>
-        <tr><td><code>repayment_schedule</code></td><td>Amortization</td><td>loan_account_id, installment_no, due_date, amount_due, status</td></tr>
-        <tr><td><code>ledger_transactions</code></td><td>Append-only ledger, mirrors Upahar's <code>PointTransaction</code> shape</td><td>loan_account_id, kind (disbursement/installment_paid/penalty/waiver/writeoff), signed amount, channel, idempotency_key</td></tr>
-        <tr><td><code>delinquency_events</code></td><td>Collections state</td><td>loan_account_id, bucket (current/watch/substandard/loss), entered_at</td></tr>
-        <tr><td><code>audit_log</code></td><td>Every state change/admin action</td><td>actor_admin_id, action, entity_type, entity_id, before/after, created_at</td></tr>
-      </table>
-    </div>
-    <p style="margin-top:var(--s4)">Every new table's migration revokes Supabase's default
-    <code>anon</code>/<code>authenticated</code> PostgREST grants, per Upahar's existing hard rule — now
-    written down as a standing checklist item for any new Supabase-backed service across the whole platform.</p>
-  </div>
-</section>
-
-<section id="ux">
-  <div class="shell">
-    <h4>UI/UX</h4>
-    <h2>Three surfaces</h2>
-    <div class="grid grid-3">
-      <div class="card">
-        <h3>Driver-facing</h3>
-        <p class="small">Lightweight web portal (not a second Flutter app), entry point linked from Upahar. Eligibility screen → application → KYC capture flow → guarantor entry (conditional) → status tracker → contract e-signature → <strong>ownership dashboard</strong> (running balance, % owned, next payment, one-tap pay) → reminders.</p>
+    <div class="row" style="margin-top:1rem">
+      <div class="col sm-6">
+        <div class="card"><div class="card-body">
+          <h4 class="card-title">Auth</h4>
+          <p class="small">Driver auth: phone + SparrowSMS OTP, issuing a JWT scoped to a distinct
+          <code>financing_driver</code> audience, deliberately not SSO-trusting Upahar's session for v1
+          to keep security boundaries independent. Admin auth mirrors the bcrypt+JWT pattern with more
+          granular roles: KYC reviewer, underwriter, collections/ops, owner/compliance.</p>
+        </div></div>
       </div>
-      <div class="card">
-        <h3>Admin console</h3>
-        <p class="small">New tabs on the existing "page + endpoint" convention: underwriting queue → KYC review → applications/contracts → ledger/collections dashboard → delinquency queue → vehicle/asset registry → NRB-facing reports (LTV, concentration, rate-cap compliance).</p>
+      <div class="col sm-6">
+        <div class="card"><div class="card-body">
+          <h4 class="card-title">Storage: Supabase Storage over raw S3, for v1</h4>
+          <p class="small">At this scale (a few thousand drivers x about 5 documents), storage/egress cost
+          is trivial either way. The deciding factor is integration effort: Supabase Storage wires
+          directly into Postgres RLS. This must be its own Supabase project, never the one Upahar and GPS
+          Dashboard already share.</p>
+        </div></div>
       </div>
-      <div class="card">
-        <h3>Field agent tool</h3>
-        <p class="small">A simple mobile-friendly page to record a cash payment collected in person — matches how Nepali MFIs and Hulas Finserv actually collect from lower-smartphone-penetration drivers.</p>
+      <div class="col sm-6">
+        <div class="card"><div class="card-body">
+          <h4 class="card-title">eKYC: DIY Textract + Rekognition, for v1</h4>
+          <p class="small">Per-driver verification cost is roughly $0.07 (Textract AnalyzeID for 2
+          documents + Rekognition liveness + face-compare) versus $2 to $7 per verification for global
+          vendors like Jumio/Onfido. DIY is roughly an order of magnitude cheaper; the trade-off is owning
+          fraud-detection tuning in-house, acceptable when a human still signs off on every KYC approval
+          regardless.</p>
+        </div></div>
+      </div>
+      <div class="col sm-6">
+        <div class="card"><div class="card-body">
+          <h4 class="card-title">Three UI surfaces</h4>
+          <p class="small">Driver-facing web portal (not a second app), linked from Upahar. Admin console
+          adding new tabs to the existing page+endpoint convention. A field-agent tool to record cash
+          payments collected in person, matching how Nepali MFIs actually collect.</p>
+        </div></div>
       </div>
     </div>
+
+    <details class="collapsible-plain">
+      <summary>Full data model: 11 tables</summary>
+      <div class="table-wrap" style="margin-top:1rem">
+        <table>
+          <tr><th>Table</th><th>Purpose</th></tr>
+          <tr><td><code>drivers</code></td><td>Identity, linked to the canonical identity layer via phone</td></tr>
+          <tr><td><code>kyc_documents</code></td><td>Uploaded documents: citizenship/NID/license/PAN/selfie, review status</td></tr>
+          <tr><td><code>guarantors</code></td><td>Cold-start co-signers</td></tr>
+          <tr><td><code>vehicles</code></td><td>Asset registry, deliberately separate from Upahar's driver-vehicle columns, which reflect only the driver's current Yango-assigned vehicle</td></tr>
+          <tr><td><code>loan_products</code></td><td>Configurable plan terms: tenure, down payment %, interest, penalty rate</td></tr>
+          <tr><td><code>applications</code></td><td>Origination workflow state</td></tr>
+          <tr><td><code>loan_accounts</code></td><td>The active agreement, including <code>lender_of_record</code> which absorbs the legal-path decision without blocking the build</td></tr>
+          <tr><td><code>repayment_schedule</code></td><td>Amortization</td></tr>
+          <tr><td><code>ledger_transactions</code></td><td>Append-only ledger, mirrors Upahar's <code>PointTransaction</code> shape</td></tr>
+          <tr><td><code>delinquency_events</code></td><td>Collections state: current/watch/substandard/loss</td></tr>
+          <tr><td><code>audit_log</code></td><td>Every state change and admin action</td></tr>
+        </table>
+      </div>
+      <p style="margin-top:0.75rem">Every new table's migration revokes Supabase's default
+      <code>anon</code>/<code>authenticated</code> PostgREST grants, per Upahar's existing hard rule, now
+      a standing checklist item for any new Supabase-backed service across the whole platform.</p>
+    </details>
   </div>
 </section>
 
 <section id="scoring">
-  <div class="shell">
-    <h4>Credit scoring v1</h4>
+  <div class="wrap">
+    <h4 class="eyebrow">Credit scoring v1</h4>
     <h2>Internal-only, rules-based</h2>
-    <p>Every thin-file lender researched (Watu, Tugende) starts here — a rules-based scorecard, not an ML
+    <p>Every thin-file lender researched (Watu, Tugende) starts here: a rules-based scorecard, not an ML
     model, since there's no proprietary repayment history yet to train on.</p>
     <p><strong>Inputs available day one, all from Upahar:</strong> tenure, lifetime trips/gross and their
-    consistency, current/longest streak, active status, tier/XP. <strong>Once the identity layer exists,
-    also from Express:</strong> delivery tenure and reliability, for drivers who do both.</p>
-    <p><strong>Cold-start handling:</strong> guarantor requirement and/or higher down payment for drivers with
-    little history — mirrors Watu's guarantor model and Tugende's reference-plus-training approach, rather than
-    an outright decline.</p>
-    <p><strong>Decision flow:</strong> hard gates (KYC complete, active status, minimum tenure) → weighted
-    score → approve / decline / refer-to-manual-review, every decision and override audit-logged. Evolves into
-    a behavioral model once the service has its own repayment-history dataset.</p>
-    <div class="callout callout-caution">
-      <h4>Explicitly not in v1</h4>
-      <p>Telematics/GPS-based scoring or remote asset-disable enforcement — the Moove/M-KOPA/Watu pattern is
-      powerful but adds IoT dependency and real reputational risk (documented tracker-collusion allegations
-      against comparable East African lenders). Drivra's GPS Dashboard infrastructure already exists and could
-      support this later — see <a href="product.html">Product</a> — but it's a phase-3 decision, not a v1 one.</p>
+    consistency, current/longest streak, active status, tier/XP. Once the identity layer exists, also from
+    Express: delivery tenure and reliability, for drivers who do both.</p>
+    <p><strong>Cold-start handling:</strong> a guarantor requirement and/or higher down payment for
+    drivers with little history, mirroring Watu's guarantor model and Tugende's reference-plus-training
+    approach, rather than an outright decline. Decision flow: hard gates (KYC complete, active status,
+    minimum tenure) then a weighted score, then approve / decline / refer-to-manual-review, every decision
+    and override audit-logged.</p>
+    <div class="alert alert-warning">
+      <strong>Explicitly not in v1:</strong> telematics/GPS-based scoring or remote asset-disable
+      enforcement. The Moove/M-KOPA/Watu pattern is powerful but adds IoT dependency and real reputational
+      risk (documented tracker-collusion allegations against comparable East African lenders). Drivra's
+      GPS Dashboard infrastructure already exists and could support this later, see
+      <a href="product.html">Product</a>, but it's a phase-3 decision, not a v1 one.
     </div>
   </div>
 </section>
 
 <section id="payments">
-  <div class="shell">
-    <h4>Payments &amp; collections</h4>
-    <h2>No wallet in Nepal supports auto-debit — plan around that</h2>
-    <p>Confirmed directly against each provider's own developer documentation (not secondary commentary):
-    <strong>none of eSewa, Khalti, or Fonepay support true unattended auto-debit</strong>. eSewa's closest
-    product, "Generic Token Payment V2," still requires the customer to actively enter their token at eSewa on
-    <em>every</em> transaction — token-assisted, not silent. Khalti's ePayment Gateway docs show no
-    subscription/mandate capability at all (its "Smart Deposit" product is a wallet-side savings feature, not
-    merchant auto-charge). Fonepay's merchant API docs on this specifically weren't locatable — treat as
-    unresolved rather than confirmed absent. So in practice: collection is a manual push each cycle.
-    <strong>ConnectIPS/NCHL supports mandate-based direct debit</strong>, already used for hire-purchase EMI
-    collection — the best path to real automation for drivers with a bank account.</p>
-    <p><strong>Fee comparison:</strong> ConnectIPS is flat and cheap (Rs 2–8/transaction regardless of amount,
-    NRB bars passing this to customers); Fonepay QR is free for merchants; eSewa/Khalti card-based loading runs
-    1.75–5%. <strong>Default drivers toward ConnectIPS or Fonepay QR; support eSewa/Khalti as fallback, not
-    the primary path.</strong></p>
-    <p>v1 architecture, matching how the market leader (Hulas Finserv) already operates: SMS reminder (reused
-    SparrowSMS client) → driver pays via ConnectIPS/Fonepay QR (or eSewa/Khalti fallback) → reconciliation
-    marks the ledger paid. ConnectIPS mandate as an opt-in automated path once manual flow is proven. Cash/agent
-    collection fallback via the field agent tool. Delinquency bucketing (current → watch → substandard → loss)
-    drives dunning and, eventually, the repossession trigger.</p>
+  <div class="wrap">
+    <h4 class="eyebrow">Payments &amp; collections</h4>
+    <h2>No wallet in Nepal supports auto-debit: plan around that</h2>
+    <p>Confirmed directly against each provider's own developer documentation: none of eSewa, Khalti, or
+    Fonepay support true unattended auto-debit. eSewa's closest product still requires the customer to
+    actively enter their token at eSewa on every transaction. Khalti's docs show no subscription/mandate
+    capability at all. Fonepay's merchant API docs on this specifically weren't locatable, treat as
+    unresolved rather than confirmed absent. <strong>ConnectIPS/NCHL supports mandate-based direct
+    debit</strong>, already used for hire-purchase EMI collection, the best path to real automation for
+    drivers with a bank account.</p>
+
+    <div class="diagram">
+      <div class="mermaid">
+flowchart LR
+  A["SMS reminder<br/>reused SparrowSMS client"] --> B["Driver pays<br/>ConnectIPS/Fonepay QR<br/>eSewa/Khalti fallback"]
+  B --> C["Reconciliation<br/>marks ledger paid"]
+  C --> D{"On time?"}
+  D -->|Yes| E["Current"]
+  D -->|No| F["Delinquency bucket<br/>watch to substandard to loss"]
+  F --> G["Dunning, then<br/>repossession trigger"]
+  classDef good fill:#d7ecdf,stroke:#1a7a42,color:#14532d,stroke-width:2px;
+  classDef rethink fill:#f7e6c4,stroke:#b26a00,color:#7a4900,stroke-width:2px;
+  class A,B,C,E good;
+  class D,F,G rethink;
+      </div>
+    </div>
+    <p class="diagram-caption">ConnectIPS mandate automation is an opt-in later step, once the manual flow
+    is proven. Cash/agent collection is the fallback via the field-agent tool.</p>
+
+    <p><strong>Fee comparison:</strong> ConnectIPS is flat and cheap (Rs 2 to 8/transaction regardless of
+    amount, NRB bars passing this to customers); Fonepay QR is free for merchants; eSewa/Khalti card-based
+    loading runs 1.75 to 5%. Default drivers toward ConnectIPS or Fonepay QR; support eSewa/Khalti as
+    fallback, not the primary path. This v1 flow matches how the market leader (Hulas Finserv) already
+    operates.</p>
   </div>
 </section>
 
 <section>
-  <div class="shell">
-    <h4>Compliance &amp; risk</h4>
+  <div class="wrap">
+    <h4 class="eyebrow">Compliance &amp; risk</h4>
     <ul class="tight">
       <li>Every new table follows the Supabase PostgREST-grant-revoke migration convention.</li>
-      <li>KYC documents are the most sensitive data this system holds: Supabase Storage + RLS, encrypted at
-      rest, 5-year minimum retention per AML rules, suspicious-activity reports via goAML within 3 days.</li>
-      <li>Vehicle lien registered both on the bluebook (everyday check) and at the Secured Transactions
-      Registry Office under the Secured Transactions Act 2063 (formal legal priority) — confirm the interplay
-      of the two with counsel.</li>
-      <li>If Path A: CIB Nepal checks and §57 repossession privileges flow through the partner — the
+      <li>KYC documents are the most sensitive data this system holds: Supabase Storage + RLS, encrypted
+      at rest, 5-year minimum retention per AML rules, suspicious-activity reports via goAML within 3
+      days.</li>
+      <li>Vehicle lien registered both on the bluebook and at the Secured Transactions Registry Office
+      under the Secured Transactions Act 2063; confirm the interplay of the two with counsel.</li>
+      <li>If Path A: CIB Nepal checks and §57 repossession privileges flow through the partner. The
       partnership contract needs to define who owns which compliance obligation.</li>
-      <li>Any future IoT/GPS/remote-disable capability needs a tamper-evident, auditable data trail from day
-      one, given documented disputes in comparable markets over tracker reliability.</li>
+      <li>Any future IoT/GPS/remote-disable capability needs a tamper-evident, auditable data trail from
+      day one, given documented disputes in comparable markets over tracker reliability.</li>
     </ul>
   </div>
 </section>
 
 <footer>
-  <div class="shell">Drivra Tech — internal strategy document. Not for external distribution. See <a href="roadmap.html">Roadmap &amp; Cost</a> for the phased plan and budget.</div>
+  <div class="wrap">Drivra Tech: internal strategy document. Not for external distribution. See
+  <a href="roadmap.html">Roadmap &amp; Cost</a> for the phased plan and budget.</div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    look: 'handDrawn',
+    theme: 'neutral',
+    themeVariables: {
+      fontFamily: 'Neucha, sans-serif',
+      primaryColor: '#cfe8dc',
+      primaryTextColor: '#06442e',
+      primaryBorderColor: '#0b6948',
+      lineColor: '#2e4a62'
+    },
+    flowchart: { htmlLabels: true, curve: 'basis' }
+  });
+</script>
 </body>
 </html>

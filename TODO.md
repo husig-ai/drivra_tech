@@ -27,6 +27,12 @@ commit, so `git log` is the actual progress history.
       enterprise patterns: one small identity service + plain API, batch ETL into one small Postgres reporting
       DB, no Kafka/CDC/PgBouncer needed at this scale.
 - [x] Second commit/push with all corrections folded in
+- [x] Redesign pass: moved off the custom theme onto PaperCSS, added Mermaid diagrams (hand-drawn look)
+      throughout, added a green/amber/gray built-status color code, pushed verbose detail into
+      collapsible sections, rewrote `index.html` as a standalone full summary instead of a links page,
+      removed em dashes, dropped the salary-based engineering-cost estimate, and replaced the
+      1,000 to 5,000-driver monthly cost range with a single first-6-months figure sized to Phase 2's
+      actual pilot scale
 
 ## Next
 - [ ] Enable GitHub Pages on this repo — attempted via `gh api`, blocked by the local session's permission
