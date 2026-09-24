@@ -35,9 +35,17 @@ commit, so `git log` is the actual progress history.
       actual pilot scale
 
 ## Next
-- [ ] Enable GitHub Pages on this repo — attempted via `gh api`, blocked by the local session's permission
-      classifier (treats it as a settings change needing explicit approval). Needs either Ayush's approval in
-      this session or manual toggle in Settings → Pages (Deploy from branch: `main`, path `/`).
+- [x] Enable GitHub Pages on this repo — done (confirmed live at husig.ai/drivra_tech).
+- [x] `drivra_engine.html` — the execution plan for GPS Dashboard's fix, added from a separate session that
+      actually did the hands-on work this document could only audit from the outside: shipped the
+      TrackonGPS second-provider integration in `trackezz_etl`, then designed and verified (not just
+      proposed) the full backend replacing GPS Dashboard's direct Supabase access — read `trackezz_etl`'s
+      actual schema (confirmed via a live scratch-Postgres run, not just inspection), read `yapigo`'s
+      actual `include_object` Alembic hook and its `bcf75bd8709b` grant-revocation migration directly,
+      and confirmed the Upahar Flutter app has zero Supabase dependency (so its own eventual RDS
+      migration needs no mobile release). Folds the RDS-consolidation decision (one instance, separate
+      database per product, Express migrating too) into what was scoped here as two separate phases.
+      Added to the top nav on every page.
 - [x] Review pass: re-checked every internal cross-page anchor link resolves correctly after the correction
       edits (all clean). Content depth as of this checkpoint: ~7,800 words across the 5 pages.
 - [ ] Consider whether the Fonepay recurring-payment gap (couldn't find their dev docs at all) is worth a

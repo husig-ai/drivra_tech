@@ -20,6 +20,7 @@ green for built and fine, amber for built but needing rethinking, gray for not b
 | [product.html](product.html) | Product portfolio and driver journey across all four products |
 | [architecture.html](architecture.html) | Engineering audit: current state, debt inventory, low-hanging fruit vs. real investment, the "one source of truth" vision |
 | [financing.html](financing.html) | Full rent-to-own design: competitive landscape, Nepal regulation, system architecture, credit scoring, payments |
+| [drivra_engine.html](drivra_engine.html) | The execution plan for GPS Dashboard's fix: the new `drivra_engine` backend, the RDS consolidation it rides on, business-logic migration approach, security hardening, and the phased cutover — verified against the real repos, not proposed in the abstract |
 | [roadmap.html](roadmap.html) | Phased plan tying platform hardening and the financing build together, plus a first-6-months cost estimate |
 
 ## Process

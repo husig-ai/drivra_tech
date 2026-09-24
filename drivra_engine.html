@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GPS Engine: Execution Plan | Drivra Tech</title>
+<meta name="description" content="The concrete, verified build plan for drivra_engine: the new backend that replaces GPS Dashboard's direct Supabase access, plus the RDS consolidation it rides on.">
+<link rel="icon" href="static/img/drivra-mark.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/papercss@1.9.2/dist/paper.min.css">
+<link rel="stylesheet" href="static/css/drivra-paper.css">
+</head>
+<body>
+
+<nav class="topbar">
+  <a href="index.html" class="wordmark"><img src="static/img/drivra-mark.png" alt="">Drivra <span class="tag">Tech</span></a>
+  <div class="topnav">
+    <a href="index.html">Overview</a>
+    <a href="product.html">Product</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="financing.html">Rent-to-Own</a>
+    <a href="drivra_engine.html" class="active">GPS Engine</a>
+    <a href="roadmap.html">Roadmap &amp; Cost</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">GPS Engine <span class="badge status-missing" style="margin-left:0.5rem">Design complete, not built</span></div>
+    <h1>The concrete build behind Architecture's vision</h1>
+    <p class="lede"><a href="architecture.html#vision">Architecture</a> named GPS Dashboard's direct,
+    client-side Supabase access as the single biggest platform risk, and set out four vision items: each
+    product owns its data, one identity layer, a narrow API between products, and a batch-fed reporting
+    layer. This page is that vision turned into an actual engineering plan for GPS specifically &mdash;
+    the first product to get it &mdash; verified against the real repositories, not proposed in the
+    abstract. Full detail on every decision lives in the source plan this page summarizes.</p>
+    <div class="sectionnav">
+      <a href="#why">Why GPS first</a>
+      <a href="#target">Target architecture</a>
+      <a href="#service">drivra_engine</a>
+      <a href="#logic">Business logic</a>
+      <a href="#security">Security</a>
+      <a href="#migration">Migration path</a>
+      <a href="#cost">Cost</a>
+      <a href="#mobile">Mobile impact</a>
+      <a href="#open">Open questions</a>
+    </div>
+  </div>
+</section>
+
+<section id="why" style="padding-top:0">
+  <div class="wrap">
+    <h4 class="eyebrow">Why GPS first</h4>
+    <h2>The exact exposure Architecture flagged, confirmed directly</h2>
+    <p>Reading <code>trackezz_etl/supabase/schema.sql</code> directly (not just GPS Dashboard's code)
+    confirms it's worse than "a public key plus RLS": every RLS policy on every GPS table is
+    <code>to authenticated using (true)</code> &mdash; any signed-in dashboard login can read the
+    entire fleet's full position history, every driver mapping, every ride/revenue number, with zero
+    per-user or per-row scoping. Upahar's own repo independently reached the same conclusion first: a
+    migration already revoked <code>anon</code>/<code>authenticated</code> grants on its own tables, and
+    its docstring names <code>gps_dashboard</code> by name as the sibling app still exposed.</p>
+    <div class="alert alert-danger">
+      <strong>Also confirmed, not previously documented:</strong> <code>trackezz_etl</code> carries
+      substantial business logic as Postgres functions (day/night metrics, GPS anomaly detection,
+      ride-vs-GPS matching, revenue rollups, plate reconciliation) with real production-incident history
+      &mdash; a naive <code>DISTINCT ON</code> view that silently became a 46-second scan at production
+      scale, a manual SQL deploy that silently didn't land, <code>DROP FUNCTION</code>-before-<code>CREATE</code>
+      footguns. None of it is unit-testable outside Postgres. This is the "bad ETL design" half of the
+      problem Architecture's debt inventory didn't fully capture.
+    </div>
+  </div>
+</section>
+
+<section id="target">
+  <div class="wrap-wide">
+    <h4 class="eyebrow">Target architecture</h4>
+    <h2>One shared RDS instance, separate database per product</h2>
+    <p>Architecture's vision said "not one shared database." This plan collapses Supabase-hardening and
+    the eventual RDS migration into one move, and answers why below.</p>
+    <div class="diagram">
+      <div class="mermaid">
+flowchart TB
+  RDS[("Shared RDS Postgres<br/>ap-south-1, one instance")]
+  UPD[("upahar_db")]
+  EXD[("express_db")]
+  GPD[("gps_db")]
+  RTD[("rentown_db<br/>future")]
+  RDS --- UPD & EXD & GPD & RTD
+  UP["Upahar FastAPI<br/>unchanged"] --> UPD
+  EX["Express FastAPI<br/>unchanged"] --> EXD
+  GE["drivra_engine<br/>new"] --> GPD
+  ETL["GPS ETL Lambda<br/>unchanged, writes only"] --> GPD
+  RT["Rent-to-own<br/>not built"] -.-> RTD
+  DASH["GPS Dashboard<br/>rewired"] -->|JSON API only| GE
+  classDef good fill:#d7ecdf,stroke:#1a7a42,color:#14532d,stroke-width:2px;
+  classDef missing fill:#e5e7eb,stroke:#6b7280,color:#374151,stroke-width:2px;
+  class UP,EX,ETL good;
+  class GE,DASH,RT,RTD missing;
+      </div>
+    </div>
+    <p class="diagram-caption">Gray: new work this plan builds. Every product owns its own database and
+    is the only thing that talks to it directly &mdash; the "shared" part is infrastructure (one
+    instance, one bill, one thing to patch and back up), never data.</p>
+
+    <div class="alert alert-primary">
+      <strong>Why RDS now, not "harden Supabase, migrate later":</strong> <code>drivra_engine</code>
+      (like Upahar already) talks to Postgres directly via SQLAlchemy/asyncpg, never through Supabase's
+      PostgREST layer &mdash; the application code is identical regardless of which of the two hosts
+      Postgres. Hardening Supabase in place would be real security work thrown away days later when
+      Express's already-urgent RDS migration (no managed backups today) happens anyway. RDS is also
+      strictly better: a private-VPC instance has no public REST surface at all, versus Supabase's
+      PostgREST endpoint still existing publicly, just de-authorized.
+    </div>
+
+    <h3 style="margin-top:2rem">Migration sequencing</h3>
+    <div class="row">
+      <div class="col sm-4">
+        <div class="stat-box"><span class="n">1</span><span class="l">Express &rarr; RDS first: most
+        urgent (no managed backups today), lowest coordination cost, a clean rehearsal of the RDS
+        provisioning work</span></div>
+      </div>
+      <div class="col sm-4">
+        <div class="stat-box"><span class="n">2</span><span class="l">GPS &rarr; RDS, built fresh:
+        <code>drivra_engine</code> never touches Supabase at all &mdash; this is the plan's main build</span></div>
+      </div>
+      <div class="col sm-4">
+        <div class="stat-box"><span class="n">3</span><span class="l">Upahar &rarr; RDS last: no urgent
+        driver, benefits from two prior migrations' worth of learned experience</span></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2rem">The missing fourth vision item: a reporting database</h3>
+    <p>Made simpler specifically because every product now lives on one RDS instance:
+    <code>postgres_fdw</code> foreign tables in a new <code>reporting_db</code> point directly at
+    <code>upahar_db</code>/<code>express_db</code>/<code>gps_db</code> &mdash; no bespoke extraction
+    Lambda needed, since it's all one instance. <strong>dbt</strong> owns the transform step (its core
+    use case: testable, documented, lineage-tracked SQL), triggered by one nightly scheduled job. No
+    Step Functions, no message bus &mdash; this is exactly the "right-sized, not enterprise-sized"
+    principle Architecture already committed to. This is the piece that unblocks rent-to-own's credit
+    scoring (<a href="#rentown">below</a>).</p>
+  </div>
+</section>
+
+<section id="service">
+  <div class="wrap-wide">
+    <h4 class="eyebrow">The new service</h4>
+    <h2><code>drivra_engine</code>: same proven stack, own repo, own data</h2>
+    <p>Mirrors Upahar's architecture directly &mdash; not extended into Upahar's own repo (product
+    autonomy), a fresh service copying what's already proven: FastAPI + SQLAlchemy 2.0 (async) +
+    asyncpg + Alembic, routers &rarr; services &rarr; ORM, JWT auth, Docker + Caddy + GitHub Actions
+    &rarr; ECR &rarr; SSM deploy, <code>t4g.small</code> EC2 (one size up from Upahar's
+    <code>t4g.micro</code>, given more concurrent dashboard sessions and larger JSON payloads).</p>
+
+    <div class="table-wrap" style="margin-top:1rem">
+      <table>
+        <tr><th>API group</th><th>Replaces</th><th>Notes</th></tr>
+        <tr><td><code>positions/</code></td><td><code>fetchLatest</code>, history queries</td><td>Latest-position endpoint served from a cache table refreshed every 30&ndash;60s &mdash; faster than today's on-demand recursive-CTE view, not slower</td></tr>
+        <tr><td><code>driver-mapping/</code></td><td><code>set_vehicle_driver</code>, lookup, suggestions, reconciliation</td><td>409 with a structured error code replaces raw Postgres exception text on conflict</td></tr>
+        <tr><td><code>attributes/</code></td><td>vehicle type/fuel CRUD</td><td>Unchanged shape</td></tr>
+        <tr><td><code>analytics/</code></td><td>6 heavy SQL functions</td><td>Geofence coordinates move server-side (single source of truth, no more client-supplied config)</td></tr>
+        <tr><td><code>auth/</code></td><td>Supabase Auth</td><td>New <code>ops_users</code> table, JWT, mirrors Upahar's admin-auth pattern exactly &mdash; own audience, own secret</td></tr>
+      </table>
+    </div>
+
+    <p style="margin-top:1rem"><strong>Table ownership going forward:</strong> <code>vehicle_positions</code>
+    stays Lambda-written (unchanged ETL), <code>drivra_engine</code> reads only. <code>vehicle_driver_mapping</code>
+    and <code>vehicle_attributes</code> get adopted &mdash; <code>drivra_engine</code> becomes the sole
+    writer via idempotent migrations that no-op against the already-migrated data. The existing
+    <code>fleet.*_cache</code> tables and pg_cron jobs are superseded, not reused (a new Python-refreshed
+    writer against the same table would race the old pg_cron one during the build) &mdash; they go dead
+    at cutover and can be dropped at leisure.</p>
+  </div>
+</section>
+
+<section id="logic">
+  <div class="wrap">
+    <h4 class="eyebrow">Business logic migration</h4>
+    <h2>Port the SQL, don't rewrite the algorithms</h2>
+    <p>The ask is a new <em>service</em>, not a new <em>algorithm</em>. Recommendation: keep row-level
+    computation as SQL (near-verbatim copies of the existing, already-tuned function bodies) called from
+    Python service functions &mdash; the new Python work is the orchestration (params, caching, auth,
+    error shaping), not re-deriving window functions and gaps-and-islands logic that's already been
+    tuned through real incidents once.</p>
+    <div class="table-wrap" style="margin-top:1rem">
+      <table>
+        <tr><th>Risk</th><th>Function</th><th>Why</th></tr>
+        <tr><td><span class="badge status-critical">Highest</span></td><td><code>_vehicle_ride_segments</code></td><td>Two documented real mis-plan incidents already; a 5-way classification precedence resolved against a slowly-changing-dimension range-join</td></tr>
+        <tr><td><span class="badge status-critical">Highest</span></td><td><code>_vehicle_day_metrics_live</code></td><td>Three-stage documented tuning saga (97s&rarr;44s&rarr;20s&rarr;2-3s); easy-to-invert gap-exclusion and overnight-boundary rules</td></tr>
+        <tr><td><span class="badge status-rethink">Medium</span></td><td>Maintenance visits, GPS anomalies</td><td>Same gaps-and-islands technique, subtler "is this still ongoing" joins</td></tr>
+        <tr><td><span class="badge status-good">Low</span></td><td>Revenue, reconciliation, matching, lookups</td><td>Straightforward joins/branching &mdash; <code>set_vehicle_driver</code> (lock row, branch, write) is the one genuinely well-suited to a real Python port</td></tr>
+      </table>
+    </div>
+    <p style="margin-top:1rem"><strong>Mitigation regardless:</strong> before cutting any single function
+    over, a shadow-diff script calls both the still-live SQL and the new endpoint for the same real
+    vehicles/date ranges and diffs row-for-row across 30&ndash;60 days &times; every vehicle &mdash; a
+    concrete gate, not a suggestion. Testing also deviates from Upahar's own convention on purpose: Upahar
+    accepts SQLite-only tests because none of its logic is Postgres-specific; that's not true here, so a
+    small Postgres-backed integration suite runs on every PR.</p>
+  </div>
+</section>
+
+<section id="security">
+  <div class="wrap-wide">
+    <h4 class="eyebrow">Security, encryption &amp; access control</h4>
+    <h2>Closing the exposure completely, not partially</h2>
+    <div class="row">
+      <div class="col sm-6 md-3">
+        <div class="card"><div class="card-body">
+          <h4 class="card-title">Encryption</h4>
+          <p class="small">RDS storage encryption at instance creation (can't be retrofitted without a
+          snapshot-restore). TLS everywhere &mdash; <code>sslmode=require</code> on every connection,
+          Caddy termination on every API. KYC documents (future): S3 with SSE-KMS, never a public bucket
+          URL.</p>
+        </div></div>
+      </div>
+      <div class="col sm-6 md-3">
+        <div class="card"><div class="card-body">
+          <h4 class="card-title">PII handling</h4>
+          <p class="small">Audit logging as a first-class table from day one. Least-privilege DB roles
+          per product. No PII in logs, ever &mdash; IDs only. KYC documents (future): 5-year retention
+          floor per Nepal's Asset Laundering Prevention Act, access restricted to a KYC-reviewer role
+          specifically.</p>
+        </div></div>
+      </div>
+      <div class="col sm-6 md-3">
+        <div class="card"><div class="card-body">
+          <h4 class="card-title">RBAC</h4>
+          <p class="small">Three tiers, applied uniformly &mdash; <code>read</code>, <code>write</code>,
+          <code>admin</code> &mdash; not a per-module permission matrix. Same shape as Upahar's existing
+          owner/staff dependency pattern, extended rather than reinvented.</p>
+        </div></div>
+      </div>
+      <div class="col sm-6 md-3">
+        <div class="card"><div class="card-body">
+          <h4 class="card-title">Hardened posture</h4>
+          <p class="small">WAF on every public API (rate-limited specifically on login), GuardDuty for
+          account-level anomaly detection, in-app rate limiting from day one (a gap Upahar's own research
+          already flagged), MFA for <code>admin</code>-role accounts, dependency scanning in CI.</p>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="migration">
+  <div class="wrap-wide">
+    <h4 class="eyebrow">Migration path</h4>
+    <h2>Nothing live breaks until the last possible step</h2>
+    <p>Every phase is additive and reversible until explicitly noted. The dashboard and ETL Lambda keep
+    working, completely unchanged, through Phase 4.</p>
+    <div class="table-wrap" style="margin-top:1rem">
+      <table>
+        <tr><th>Phase</th><th>What happens</th><th>Live system</th></tr>
+        <tr><td>0</td><td>Provision <code>drivra_engine</code>'s own scoped Postgres role, RLS policies</td><td>Untouched</td></tr>
+        <tr><td>1</td><td>Skeleton, read-only positions, auth &mdash; deployed to staging only</td><td>Untouched</td></tr>
+        <tr><td>2</td><td>Driver-mapping + attributes CRUD parity, concurrency-tested</td><td>Untouched</td></tr>
+        <tr><td>3</td><td>Six analytics functions ported, shadow-verified against real data</td><td>Untouched</td></tr>
+        <tr><td>4</td><td>Dashboard rewritten, deployed to staging only, QA'd page by page against production</td><td>Untouched &mdash; last fully-reversible checkpoint</td></tr>
+        <tr><td>5</td><td>Cutover: production dashboard points at <code>drivra_engine</code></td><td>Live on new backend; same-day rollback available for 1&ndash;2 week soak</td></tr>
+        <tr><td>6</td><td>Revoke <code>anon</code>/<code>authenticated</code> PostgREST grants &mdash; mirrors Upahar's own precedent exactly</td><td><strong>The concrete fix for the flagged critical vulnerability</strong></td></tr>
+        <tr><td>7</td><td>Cleanup: old SQL functions/cache tables removed at leisure</td><td>Optional</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="cost">
+  <div class="wrap">
+    <h4 class="eyebrow">Cost</h4>
+    <h2>Estimated new infrastructure spend</h2>
+    <p class="small" style="color:var(--text-muted)">On-demand <code>ap-south-1</code> rates, not a
+    quote &mdash; confirm via the AWS Pricing Calculator before treating this as a committed budget.</p>
+    <div class="row" style="margin-top:1rem">
+      <div class="col sm-6">
+        <div class="stat-box"><span class="n">~$115&ndash;130/mo</span><span class="l">Single-AZ RDS
+        (<code>db.t4g.medium</code>) + <code>drivra_engine</code> EC2 + Fargate reporting job + storage</span></div>
+      </div>
+      <div class="col sm-6">
+        <div class="stat-box"><span class="n">~$165&ndash;180/mo</span><span class="l">Same, with Multi-AZ
+        RDS &mdash; recommended once all three products depend on the instance</span></div>
+      </div>
+    </div>
+    <p style="margin-top:1rem">Against this: Supabase's usage-based growth avoided, Express's currently
+    uninsured no-backup risk closed, and one migration instead of two (the "harden now, RDS later"
+    alternative pays for this work twice).</p>
+    <details class="collapsible-plain" style="margin-top:1rem">
+      <summary>AWS services considered, and deliberately not used</summary>
+      <div class="table-wrap" style="margin-top:1rem">
+        <table>
+          <tr><th>Category</th><th>Services</th></tr>
+          <tr><td>Already in use, unchanged</td><td>Lambda, EC2, ECR, SSM, IAM/OIDC, EventBridge Scheduler, CloudWatch</td></tr>
+          <tr><td>New, needed</td><td>RDS, S3, ECS Fargate (nightly dbt), KMS</td></tr>
+          <tr><td>Needed later, not now</td><td>Athena &mdash; only once a cold-storage tier actually exists</td></tr>
+          <tr><td>Recommended against</td><td>Glue (no messy multi-source schema-discovery problem exists here), Redshift/a message bus (explicitly what Architecture's vision says to avoid), API Gateway (Caddy already fills this role), Cognito (would replace already-proven JWT auth for no benefit)</td></tr>
+        </table>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section id="mobile">
+  <div class="wrap">
+    <h4 class="eyebrow">Mobile impact</h4>
+    <h2>Checked directly: zero changes needed</h2>
+    <div class="alert alert-primary">
+      Upahar's Flutter driver app (<code>app_rider/</code>) was inspected directly, not assumed: no
+      Supabase dependency anywhere in its source or its package manifest. It talks exclusively to
+      Upahar's own API over a plain HTTP client. Since the database migration is entirely internal to
+      the backend, <strong>every installed app is unaffected, with no new release required</strong> &mdash;
+      the concrete payoff of Upahar already having a real backend in front of its data, which is exactly
+      what this plan gives GPS Dashboard for the first time.
+    </div>
+  </div>
+</section>
+
+<section id="rentown">
+  <div class="wrap">
+    <h4 class="eyebrow">Alignment with Rent-to-Own</h4>
+    <h2>Same pattern, not a new decision when it's built</h2>
+    <p>This plan's "product autonomy, proven stack, separate database" pattern is exactly what
+    <a href="financing.html">financing.html</a> already independently specifies for the rent-to-own
+    service: its own repo, own database (a database on the shared RDS instance under this model, rather
+    than a fully separate Supabase project), same FastAPI + SQLAlchemy + Alembic stack. Its credit
+    scoring depends on Upahar's tenure/earnings/streak data &mdash; exactly the cross-product signal the
+    new reporting database (<a href="#target">above</a>) exists to serve, and explicitly does not depend
+    on GPS telematics data in v1.</p>
+  </div>
+</section>
+
+<section id="open">
+  <div class="wrap">
+    <h4 class="eyebrow">Open questions</h4>
+    <h2>Flagged, not silently decided</h2>
+    <ul class="tight">
+      <li>Upahar's <code>drivers</code>/<code>orders</code> read boundary: table-level grant with the ORM
+      limiting columns (simplest, zero Upahar changes) vs. Upahar adding a narrow view (preserves
+      column-level least privilege exactly, matches Upahar's own stated forward policy, but touches its repo).</li>
+      <li>Session/token revocation: accept Upahar's flat-TTL-only precedent vs. add a blocklist table for
+      instant revocation of a compromised token.</li>
+      <li><code>t4g.small</code> vs. <code>t4g.micro</code> for the new instance &mdash; a reasoned
+      recommendation, cheap to revisit with real post-launch metrics.</li>
+      <li>Where <code>husig.ai/drivra_tech</code> and the wider infra-as-code source of truth should live
+      long-term, given the existing two-GitHub-org split &mdash; not resolved by this plan, worth a
+      deliberate decision before a fifth product adds to it.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Drivra Tech: internal strategy document. Not for external distribution.</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    look: 'handDrawn',
+    theme: 'neutral',
+    themeVariables: {
+      fontFamily: 'Neucha, sans-serif',
+      primaryColor: '#cfe8dc',
+      primaryTextColor: '#06442e',
+      primaryBorderColor: '#0b6948',
+      lineColor: '#2e4a62'
+    },
+    flowchart: { htmlLabels: true, curve: 'basis' }
+  });
+</script>
+</body>
+</html>
